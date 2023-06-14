@@ -1,19 +1,25 @@
+package Conector;
+
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
+
 
 public class AccesoBaseDeDatos {
 
     private Connection conexion;
     private String nombreBaseDeDatos;
-    private String nombreTabla;
+    private List<String> nombreTabla;
 
-    public AccesoBaseDeDatos(String nombreBaseDeDatos, String nombreTabla) {
+    public AccesoBaseDeDatos(String nombreBaseDeDatos, List<String> nombreTabla) {
         this.nombreBaseDeDatos = nombreBaseDeDatos;
         this.nombreTabla = nombreTabla;
     }
     public AccesoBaseDeDatos(String nombreBaseDeDatos) {
         this.nombreBaseDeDatos = nombreBaseDeDatos;
     }
+
+
 
     public void conectar(String user, String password) {
 
@@ -127,8 +133,11 @@ public class AccesoBaseDeDatos {
     File -> Project Structure -> + -> JARs y directorios ->
     seleccionar mongo-java-driver -> tildar -> aplicar -> ok
     */
-    public static void main(String[] args) {
+    public static void main(String[] args){
+
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
+
+        db.obtenerResultado("call listarPasajerosXvuelo();");
     }
 }
