@@ -19,8 +19,6 @@ public class AccesoBaseDeDatos {
         this.nombreBaseDeDatos = nombreBaseDeDatos;
     }
 
-
-
     public void conectar(String user, String password) {
 
         String url = "jdbc:mysql://localhost:3306/" + this.nombreBaseDeDatos;
@@ -127,6 +125,7 @@ public class AccesoBaseDeDatos {
         return nombresDeCampos;
     }
 
+
     /*
     Colocar mysql-connector-java-8.0.21.jar en una carpeta llamada lib
 
@@ -134,10 +133,10 @@ public class AccesoBaseDeDatos {
     seleccionar mongo-java-driver -> tildar -> aplicar -> ok
     */
     public static void main(String[] args){
-
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
         db.obtenerResultado("call listarPasajerosXvuelo();");
+
     }
 }
