@@ -81,50 +81,37 @@ public class AccesoBaseDeDatos {
 
     public void imprimirDatos(ResultSet resultado1) throws SQLException {
 
-        ResultSet resultado = resultado1;
-        ResultSetMetaData rsmd= null;
-        try {
-            rsmd = (ResultSetMetaData) resultado.getMetaData();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        String col=rsmd.getColumnName(1);
-        int cantCol=rsmd.getColumnCount();
-        System.out.println(col);
-        System.out.println(cantCol);
+
+        ArrayList<String>columnas=obtenerNombresColumnas(resultado1);
         try {
 
-            while (resultado.next()) {
+            while (resultado1.next()) {
+                String fila="";
+                for (int i=1; i<=columnas.size();i++){
+                    String temp = resultado1.getString(i);
+                    fila=fila + temp + " ";
+                }
+                System.out.println(fila);
 
-                String idvuelo = resultado.getString("vuelo_idvuelo");
-                String dni= resultado.getString("pasajero_persona_dni");
-
-                System.out.println(idvuelo + " " + dni);
             }
 
-            resultado.close();
+            resultado1.close();
 
         } catch (SQLException excepcion) {
             excepcion.printStackTrace();
         }
     }
 
-    public ArrayList<String> obtenerColumnasDeUnaTabla(String nombreTabla) {
-        String consulta = "SHOW COLUMNS FROM " + nombreTabla;
-        ArrayList<String> nombreCampos = new ArrayList<>();
-        try {
-            ResultSet data;
-            PreparedStatement sentenciaSQL = conexion.prepareStatement(consulta);
-            data = sentenciaSQL.executeQuery(consulta);
-            while (data.next() == true) {
-                nombreCampos.add(data.getString("Field"));
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+    public ArrayList<String> obtenerNombresColumnas(ResultSet resultadoConsulta) throws SQLException {
+        ArrayList<String>columnas=new ArrayList<String>();
+        ResultSetMetaData resultadoMeta= (ResultSetMetaData) resultadoConsulta.getMetaData();
+        for (int i=1;i<=resultadoMeta.getColumnCount();i++){
+            columnas.add(resultadoMeta.getColumnName(i));
         }
-        return nombreCampos;
+        return columnas;
     }
+
+
 
 
 
