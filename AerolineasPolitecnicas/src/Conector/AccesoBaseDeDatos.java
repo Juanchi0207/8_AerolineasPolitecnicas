@@ -1,5 +1,7 @@
 package Conector;
 
+import com.mysql.cj.jdbc.result.ResultSetMetaData;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,20 +79,27 @@ public class AccesoBaseDeDatos {
         return resultado;
     }
 
-    public void imprimirDatos() {
+    public void imprimirDatos(ResultSet resultado1) throws SQLException {
 
-        ResultSet resultado = this.seleccionarTodo();
-
+        ResultSet resultado = resultado1;
+        ResultSetMetaData rsmd= null;
+        try {
+            rsmd = (ResultSetMetaData) resultado.getMetaData();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        String col=rsmd.getColumnName(1);
+        int cantCol=rsmd.getColumnCount();
+        System.out.println(col);
+        System.out.println(cantCol);
         try {
 
             while (resultado.next()) {
 
-                int id = resultado.getInt("id");
-                String nombre = resultado.getString("nombre");
-                String apellido = resultado.getString("apellido");
-                int edad = resultado.getInt("edad");
+                String idvuelo = resultado.getString("vuelo_idvuelo");
+                String dni= resultado.getString("pasajero_persona_dni");
 
-                System.out.println(id + " " + nombre + " " + apellido + " " + edad);
+                System.out.println(idvuelo + " " + dni);
             }
 
             resultado.close();
@@ -100,30 +109,23 @@ public class AccesoBaseDeDatos {
         }
     }
 
-    public ResultSet mostrarColumnas(){
-        String consulta = "SHOW COLUMNS FROM " + this.nombreTabla;
-        ResultSet resultado = this.obtenerResultado(consulta);
-        return resultado;
-    }
-
-    public ArrayList<String> colocarCamposEnLista() {
-
-        ArrayList<String> nombresDeCampos = new ArrayList<>();
-        ResultSet resultado = this.mostrarColumnas();
-
+    public ArrayList<String> obtenerColumnasDeUnaTabla(String nombreTabla) {
+        String consulta = "SHOW COLUMNS FROM " + nombreTabla;
+        ArrayList<String> nombreCampos = new ArrayList<>();
         try {
-
-            while (resultado.next()) {
-                String nombreDeColumna = resultado.getString("field");
-                nombresDeCampos.add(nombreDeColumna);
+            ResultSet data;
+            PreparedStatement sentenciaSQL = conexion.prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+            while (data.next() == true) {
+                nombreCampos.add(data.getString("Field"));
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
-        return nombresDeCampos;
+        return nombreCampos;
     }
+
 
 
     /*
@@ -132,11 +134,12 @@ public class AccesoBaseDeDatos {
     File -> Project Structure -> + -> JARs y directorios ->
     seleccionar mongo-java-driver -> tildar -> aplicar -> ok
     */
-    public static void main(String[] args){
+    public static void main(String[] args) throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        db.obtenerResultado("call listarPasajerosXvuelo();");
+        ResultSet resultado=db.obtenerResultado("call listarPasajerosXvuelo();");
+        db.imprimirDatos(resultado);
 
     }
 }
