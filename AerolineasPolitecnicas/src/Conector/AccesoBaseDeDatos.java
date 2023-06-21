@@ -113,7 +113,50 @@ public class AccesoBaseDeDatos {
 
 
 
+    public static void llamarPasajeroMasJoven() throws SQLException {
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
 
+        ResultSet resultado=db.obtenerResultado("select nombre,dni,max(fecha_nacimiento), idvuelo from persona join pasajero on dni=persona_dni " +
+                "join vuelo_has_pasajero on pasajero_persona_dni=persona_dni join vuelo on idvuelo=vuelo_idvuelo " +
+                "group by idvuelo,dni,nombre;");
+            db.imprimirDatos(resultado);
+
+    } //hay que cambiar un par de cosas
+
+    public static void CambiarvueloPasajero() throws SQLException {
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        int idPasajero =46679230;
+        int idVuelo = 1;
+        ResultSet resultado=db.obtenerResultado("call CambioPasaje("+idPasajero + "," + idVuelo + ");" );
+        db.imprimirDatos(resultado);
+         /*no devuelve un resultado, cambiarlo para que solo ejecute en la base de  datos,
+         o que devuelva un parametro de salida*/
+    }
+
+    public static void AvionMasNuevo() throws SQLException {
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        ResultSet resultado=db.obtenerResultado("select num_serie from avion where min(fecha_fabricacion); " );
+        db.imprimirDatos(resultado);
+
+    } /*No eciste el atributo fecha de fabricacion pero como no se si al agregarlo va a cambiar
+        los inserts ya hechos x ahora lo dejo asi y luego lo modificamos*/
+
+    public static void IdiomasHablados() throws SQLException {
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        ResultSet resultado=db.obtenerResultado("select distinct(idioma),idvuelo from idioma join " +
+                "idioma_has_tripulante on idioma_ididioma = ididioma join tripulante on tripulante_persona_dni=persona_dni " +
+                "join tripulante_has_vuelo on persona_dni=tripulante_has_vuelo.tripulante_persona_dni join vuelo " +
+                "on vuelo_idvuelo=idvuelo order by idvuelo,idioma;" );
+        db.imprimirDatos(resultado);
+
+    }
 
     /*
     Colocar mysql-connector-java-8.0.21.jar en una carpeta llamada lib
@@ -128,5 +171,9 @@ public class AccesoBaseDeDatos {
         ResultSet resultado=db.obtenerResultado("call listarPasajerosXvuelo();");
         db.imprimirDatos(resultado);
 
+       // llamarPasajeroMasJoven();
+      // CambiarvueloPasajero();
+        //AvionMasNuevo();
+        IdiomasHablados();
     }
 }
