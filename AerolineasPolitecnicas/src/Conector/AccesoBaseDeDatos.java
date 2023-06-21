@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AccesoBaseDeDatos {
+public class                                    AccesoBaseDeDatos {
 
     private Connection conexion;
     private String nombreBaseDeDatos;
@@ -113,7 +113,7 @@ public class AccesoBaseDeDatos {
 
 
 
-    public static void llamarPasajeroMasJoven() throws SQLException {
+    public void llamarPasajeroMasJoven() throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
@@ -124,7 +124,7 @@ public class AccesoBaseDeDatos {
 
     } //hay que cambiar un par de cosas
 
-    public static void CambiarvueloPasajero() throws SQLException {
+    public void CambiarvueloPasajero() throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
@@ -136,7 +136,7 @@ public class AccesoBaseDeDatos {
          o que devuelva un parametro de salida*/
     }
 
-    public static void AvionMasNuevo() throws SQLException {
+    public void AvionMasNuevo() throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
@@ -146,7 +146,7 @@ public class AccesoBaseDeDatos {
     } /*No eciste el atributo fecha de fabricacion pero como no se si al agregarlo va a cambiar
         los inserts ya hechos x ahora lo dejo asi y luego lo modificamos*/
 
-    public static void IdiomasHablados() throws SQLException {
+    public void IdiomasHablados() throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
@@ -156,6 +156,22 @@ public class AccesoBaseDeDatos {
                 "on vuelo_idvuelo=idvuelo order by idvuelo,idioma;" );
         db.imprimirDatos(resultado);
 
+    }
+
+    public void PasajerosXVuelo() throws SQLException{
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        ResultSet resultado = db.obtenerResultado("call listarPasajerosXvuelo();");
+        db.imprimirDatos(resultado);
+    }
+
+    public void cantidadMinima() throws SQLException{
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        ResultSet resultado = db.obtenerResultado("call listarPasajerosXvuelo();");
+        db.imprimirDatos(resultado);
     }
 
     /*
@@ -168,12 +184,11 @@ public class AccesoBaseDeDatos {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        ResultSet resultado=db.obtenerResultado("call listarPasajerosXvuelo();");
-        db.imprimirDatos(resultado);
 
-       // llamarPasajeroMasJoven();
-      // CambiarvueloPasajero();
+        // db.llamarPasajeroMasJoven();
+        db.PasajerosXVuelo();
+        // CambiarvueloPasajero();
         //AvionMasNuevo();
-        IdiomasHablados();
+        // IdiomasHablados();
     }
 }
