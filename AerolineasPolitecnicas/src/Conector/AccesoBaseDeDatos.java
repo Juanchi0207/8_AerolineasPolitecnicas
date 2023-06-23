@@ -124,7 +124,7 @@ public class                                    AccesoBaseDeDatos {
 
     } //hay que cambiar un par de cosas
 
-    public void CambiarvueloPasajero() throws SQLException {
+    public void cambiarvueloPasajero() throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
@@ -136,17 +136,17 @@ public class                                    AccesoBaseDeDatos {
          o que devuelva un parametro de salida*/
     }
 
-    public void AvionMasNuevo() throws SQLException {
+    public void avionMasNuevo() throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        ResultSet resultado=db.obtenerResultado("select num_serie from avion where min(fecha_fabricacion); " );
+        ResultSet resultado=db.obtenerResultado("select num_serie from avion where fecha_fabricacion=(select max(fecha_fabricacion) from avion);" );
         db.imprimirDatos(resultado);
 
     } /*No eciste el atributo fecha de fabricacion pero como no se si al agregarlo va a cambiar
         los inserts ya hechos x ahora lo dejo asi y luego lo modificamos*/
 
-    public void IdiomasHablados() throws SQLException {
+    public void idiomasHablados() throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
@@ -158,7 +158,7 @@ public class                                    AccesoBaseDeDatos {
 
     }
 
-    public void PasajerosXVuelo() throws SQLException{
+    public void pasajerosXVuelo() throws SQLException{
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
@@ -186,9 +186,10 @@ public class                                    AccesoBaseDeDatos {
 
 
         // db.llamarPasajeroMasJoven();
-        db.PasajerosXVuelo();
-        // CambiarvueloPasajero();
-        //AvionMasNuevo();
-        // IdiomasHablados();
+
+
+        // cambiarvueloPasajero();
+        db.avionMasNuevo();
+        //db.idiomasHablados();
     }
 }

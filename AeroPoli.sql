@@ -1,12 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.31, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.33, for Linux (x86_64)
 --
--- Host: 127.0.0.1    Database: mydb
+-- Host: 127.0.0.1    Database: AerolineasPolitecnicas
 -- ------------------------------------------------------
--- Server version	8.0.31-0ubuntu0.22.04.1
-
-create database AerolineasPolitecnicas;
-use AerolineasPolitecnicas;
-
+-- Server version	8.0.33-0ubuntu0.22.04.2
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -30,6 +26,7 @@ CREATE TABLE `avion` (
   `patente` int NOT NULL,
   `modelo_modelo` varchar(45) NOT NULL,
   `num_serie` int DEFAULT NULL,
+  `fecha_fabricacion` date DEFAULT NULL,
   PRIMARY KEY (`patente`),
   KEY `fk_avion_modelo1_idx` (`modelo_modelo`),
   CONSTRAINT `fk_avion_modelo1` FOREIGN KEY (`modelo_modelo`) REFERENCES `modelo` (`modelo`)
@@ -42,7 +39,7 @@ CREATE TABLE `avion` (
 
 LOCK TABLES `avion` WRITE;
 /*!40000 ALTER TABLE `avion` DISABLE KEYS */;
-INSERT INTO `avion` VALUES (1,'Boeing 747',123);
+INSERT INTO `avion` VALUES (1,'Boeing 747',123,'2015-09-13'),(2,'Airbus A318',234,'2017-02-28'),(3,'Airbus A380',345,'2023-06-25'),(4,'Boeing 787 Dreamliner',456,'2020-05-02');
 /*!40000 ALTER TABLE `avion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -66,6 +63,7 @@ CREATE TABLE `idioma` (
 
 LOCK TABLES `idioma` WRITE;
 /*!40000 ALTER TABLE `idioma` DISABLE KEYS */;
+INSERT INTO `idioma` VALUES (1,'Castellano'),(2,'Ingles'),(3,'Italiano'),(4,'Portugues'),(5,'Aleman');
 /*!40000 ALTER TABLE `idioma` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -93,6 +91,7 @@ CREATE TABLE `idioma_has_tripulante` (
 
 LOCK TABLES `idioma_has_tripulante` WRITE;
 /*!40000 ALTER TABLE `idioma_has_tripulante` DISABLE KEYS */;
+INSERT INTO `idioma_has_tripulante` VALUES (1,46111111),(2,46111111),(5,46111111),(1,46222222),(3,46222222),(4,46222222);
 /*!40000 ALTER TABLE `idioma_has_tripulante` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -117,7 +116,7 @@ CREATE TABLE `modelo` (
 
 LOCK TABLES `modelo` WRITE;
 /*!40000 ALTER TABLE `modelo` DISABLE KEYS */;
-INSERT INTO `modelo` VALUES ('Boeing 747',400,25);
+INSERT INTO `modelo` VALUES ('Airbus A318',117,8),('Airbus A380',853,50),('Boeing 747',400,2),('Boeing 787 Dreamliner',323,25);
 /*!40000 ALTER TABLE `modelo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -145,7 +144,7 @@ CREATE TABLE `modelo_has_tripulante` (
 
 LOCK TABLES `modelo_has_tripulante` WRITE;
 /*!40000 ALTER TABLE `modelo_has_tripulante` DISABLE KEYS */;
-INSERT INTO `modelo_has_tripulante` VALUES ('Boeing 747',46111111),('Boeing 747',46222222);
+INSERT INTO `modelo_has_tripulante` VALUES ('Airbus A318',46111111),('Airbus A380',46111111),('Boeing 747',46111111),('Boeing 747',46222222),('Boeing 787 Dreamliner',46222222);
 /*!40000 ALTER TABLE `modelo_has_tripulante` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -276,7 +275,7 @@ CREATE TABLE `tripulante_has_vuelo` (
 
 LOCK TABLES `tripulante_has_vuelo` WRITE;
 /*!40000 ALTER TABLE `tripulante_has_vuelo` DISABLE KEYS */;
-INSERT INTO `tripulante_has_vuelo` VALUES (46111111,1,1),(46111111,2,1),(46222222,1,1);
+INSERT INTO `tripulante_has_vuelo` VALUES (46111111,1,1),(46111111,2,1),(46222222,1,1),(46222222,3,2);
 /*!40000 ALTER TABLE `tripulante_has_vuelo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -305,7 +304,7 @@ CREATE TABLE `vuelo` (
 
 LOCK TABLES `vuelo` WRITE;
 /*!40000 ALTER TABLE `vuelo` DISABLE KEYS */;
-INSERT INTO `vuelo` VALUES (1,1,'2023-06-12','CABA','Miami'),(2,1,'2023-06-16','Miami','CABA'),(3,1,'2023-06-19','CABA','Miami');
+INSERT INTO `vuelo` VALUES (1,1,'2023-06-12','CABA','Miami'),(2,1,'2023-06-16','Miami','CABA'),(3,1,'2023-06-19','CABA','Miami'),(4,2,'2023-07-25','CABA','Londres'),(5,2,'2023-07-28','Londres','CABA'),(6,3,'2023-07-14','CABA','Washington DC'),(7,3,'2023-07-19','Washington DC','CABA'),(8,4,'2023-07-02','CABA','Ibiza'),(9,4,'2023-07-12','Ibiza','CABA');
 /*!40000 ALTER TABLE `vuelo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -333,16 +332,16 @@ CREATE TABLE `vuelo_has_pasajero` (
 
 LOCK TABLES `vuelo_has_pasajero` WRITE;
 /*!40000 ALTER TABLE `vuelo_has_pasajero` DISABLE KEYS */;
-INSERT INTO `vuelo_has_pasajero` VALUES (1,46679230),(2,46679230),(2,46878279),(3,46878279);
+INSERT INTO `vuelo_has_pasajero` VALUES (2,46679230),(3,46679230),(2,46878279),(3,46878279);
 /*!40000 ALTER TABLE `vuelo_has_pasajero` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Dumping events for database 'mydb'
+-- Dumping events for database 'AerolineasPolitecnicas'
 --
 
 --
--- Dumping routines for database 'mydb'
+-- Dumping routines for database 'AerolineasPolitecnicas'
 --
 /*!50003 DROP FUNCTION IF EXISTS `cantVuelosXtripulanteXdia` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -438,6 +437,26 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `cantTripulantesXvuelo` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`alumno`@`localhost` PROCEDURE `cantTripulantesXvuelo`()
+begin
+	select vuelo_idvuelo , count(*) as cantidad
+    from tripulante_has_vuelo group by vuelo_idvuelo;
+end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `listarPasajerosXvuelo` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -450,54 +469,8 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`alumno`@`localhost` PROCEDURE `listarPasajerosXvuelo`()
 begin
-	declare terminar boolean default 0;
-    declare codActual int default null;
-    declare recorrerVuelos CURSOR for select idvuelo from vuelo;
-    DECLARE CONTINUE HANDLER for not found SET terminar=1;
-    open recorrerVuelos;
-    bucle:loop
-		fetch recorrerVuelos into codActual;
-		if terminar=1 then
-			leave bucle;
-		end if;
-        select count(*) as cantidad_pasajeros,vuelo_idvuelo as idvuelo from persona 
-        join pasajero on dni=persona_dni join vuelo_has_pasajero 
-        on persona_dni=pasajero_persona_dni where vuelo_idvuelo=codActual 
-        group by vuelo_idvuelo;
-	end loop bucle;
-end ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `listarTripulantesXvuelo` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`alumno`@`localhost` PROCEDURE `listarTripulantesXvuelo`()
-begin
-	declare terminar boolean default 0;
-    declare codActual int default null;
-    declare recorrerVuelos CURSOR for select idvuelo from vuelo;
-    DECLARE CONTINUE HANDLER for not found SET terminar=1;
-    open recorrerVuelos;
-    bucle:loop
-		fetch recorrerVuelos into codActual;
-		if terminar=1 then
-			leave bucle;
-		end if;
-        select count(*) as cantidad_tripulantes,vuelo_idvuelo as idvuelo from persona 
-        join tripulante on dni=persona_dni join tripulante_has_vuelo 
-        on persona_dni=tripulante_persona_dni where vuelo_idvuelo=codActual
-        group by vuelo_idvuelo;
-	end loop bucle;
+	select vuelo_idvuelo ,pasajero_persona_dni 
+    from vuelo_has_pasajero order by vuelo_idvuelo;
 end ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -536,4 +509,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-06-14  9:38:27
+-- Dump completed on 2023-06-23 14:58:37
