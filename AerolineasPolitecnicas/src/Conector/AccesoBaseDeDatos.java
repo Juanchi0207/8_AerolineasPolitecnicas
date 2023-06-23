@@ -174,6 +174,14 @@ public class                                    AccesoBaseDeDatos {
         db.imprimirDatos(resultado);
     }
 
+    public void vuelosXdia() throws SQLException{
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        ResultSet resultado = db.obtenerResultado("call vuelosXTripulante(current_date());");
+        db.imprimirDatos(resultado);
+    }
+
     /*
     Colocar mysql-connector-java-8.0.21.jar en una carpeta llamada lib
 
