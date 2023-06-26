@@ -13,8 +13,8 @@ public class Pasajero extends Persona{
         this.especial = false;
     }
 
-    public Pasajero(String nombre, String apellido, Date nacimiento, int dni, boolean vip, boolean especial) {
-        super(nombre, apellido, nacimiento, dni);
+    public Pasajero(int dni,String nombre, String apellido, Date nacimiento, boolean vip, boolean especial) {
+        super(dni,nombre , apellido, nacimiento);
         this.vip = vip;
         this.especial = especial;
     }

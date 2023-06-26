@@ -4,25 +4,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Vuelo {
+    private int idVuelo;
     private Avion avion;
     private Date fecha;
     private String origen;
     private String destino;
-    private HashSet<Tripulante>tripulantes = new HashSet<>();
-    private HashSet<Pasajero>pasajeros = new HashSet<>();
+    private HashSet<Tripulante>tripulantes = new HashSet<Tripulante>();
+    private HashSet<Pasajero>pasajeros = new HashSet<Pasajero>(                                                              );
     private HashMap<Tripulante, Sector>area = new HashMap<>();
 
-    public Vuelo() {
-        this.avion = new Avion();
-        this.fecha = null;
-        this.origen = "Argentina";
-        this.destino = "Argentina";
-        this.tripulantes.add(new Tripulante());
-        this.pasajeros.add(new Pasajero());
-        this.area.put(new Tripulante(), Sector.GOOFYAHH);
-    }
 
-    public Vuelo(Avion avion, Date fecha, String origen, String destino, HashSet<Tripulante> tripulantes, HashSet<Pasajero> pasajeros, HashMap<Tripulante, Sector> area) {
+
+    public Vuelo(int idVuelo,Avion avion, Date fecha, String origen, String destino, HashSet<Tripulante> tripulantes, HashSet<Pasajero> pasajeros, HashMap<Tripulante, Sector> area) {
+        this.idVuelo=idVuelo;
         this.avion = avion;
         this.fecha = fecha;
         this.origen = origen;
@@ -30,6 +24,14 @@ public class Vuelo {
         this.tripulantes = tripulantes;
         this.pasajeros = pasajeros;
         this.area = area;
+    }
+
+    public int getIdVuelo() {
+        return idVuelo;
+    }
+
+    public void setIdVuelo(int idVuelo) {
+        this.idVuelo = idVuelo;
     }
 
     public Avion getAvion() {

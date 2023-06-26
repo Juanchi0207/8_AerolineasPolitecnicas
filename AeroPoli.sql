@@ -4,10 +4,6 @@
 -- ------------------------------------------------------
 -- Server version	8.0.33-0ubuntu0.22.04.2
 
-drop database AerolineasPolitecnicas;
-create database AerolineasPolitecnicas;
-use AerolineasPolitecnicas;
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -367,7 +363,6 @@ begin
     return cantVuelos;
 end ;;
 DELIMITER ;
-
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
@@ -413,6 +408,31 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `pasajeroMasJoven` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`alumno`@`localhost` FUNCTION `pasajeroMasJoven`(vueloId int) RETURNS int
+    DETERMINISTIC
+begin
+	declare masJoven int default 0;
+	select dni into masJoven from persona join pasajero on dni=persona_dni 
+	join vuelo_has_pasajero on pasajero_persona_dni=persona_dni where vuelo_idvuelo=vueloId
+	and fecha_nacimiento=(select max(fecha_nacimiento) from persona join pasajero on dni=persona_dni 
+	join vuelo_has_pasajero on pasajero_persona_dni=persona_dni);
+    return masJoven;
+end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `cambioPasaje` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -435,7 +455,7 @@ select destino into destinoNuevo from vuelo where idvuelo=vueloID;
 select idvuelo into idVueloNuevo from vuelo where week(fecha_vuelo)=FV
 and destino=destinoNuevo and origen=origenNuevo;
 update vuelo_has_pasajero set vuelo_idvuelo = idVueloNuevo 
-where idPasajero = pasajero_persona_dni and vuelo_idvuelo=vueloID; 
+where idPasajero = pasajero_persona_dni and vuelo_idvuelo=vueloID;
 end ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -514,54 +534,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-DELIMITER // 
-create function vuelosXTripulante(fechaAnalizar date) returns varchar(500)
-DETERMINISTIC
-	BEGIN
-    
-	declare done int default false;
-    declare auxDNI int;
-    declare auxDNI2 int;
-    declare tripulantes2 varchar(500);
-    declare cur cursor for select persona_dni, count(*) from tripulante where persona_dni in (select tripulante_persona_dni from tripulante_has_vuelo where vuelo_idvuelo in (select idvuelo from vuelo where fecha_vuelo = fechaAnalizar));
-	declare continue handler for not found set done = true;
-    
-    open cur;
-    read_loop: loop
-    fetch cur into auxDNI, auxDNI2;
-    IF done THEN
-      LEAVE read_loop;
-    END IF;
-    
-    if auxDNI2 > 1 then
-    set tripulantes2 = concat(tripulantes2, "-", auxDNI);
-    else
-    set tripulantes2 = concat(tripulantes);
-	end if;
-    
-    END LOOP;
-    
-	CLOSE cur;
-
-    return tripulantes2;
-	END//
-
-DELIMITER ; 
-			
-insert into vuelo values ()
-
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `vuelosXTripulante` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-
--- Dump completed on 2023-06-23 14:58:37
+-- Dump completed on 2023-06-23 17:31:46

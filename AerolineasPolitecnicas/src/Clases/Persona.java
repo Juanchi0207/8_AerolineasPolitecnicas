@@ -2,10 +2,11 @@ package Clases;
 import java.util.Date;
 
 public class Persona {
+    private int dni;
     private String nombre;
     private String apellido;
     private Date nacimiento;
-    private int dni;
+
 
     public Persona() {
         this.nombre="Dummy";
@@ -14,7 +15,7 @@ public class Persona {
         this.dni = 1;
     }
 
-    public Persona(String nombre, String apellido, Date nacimiento, int dni) {
+    public Persona(int dni,String nombre, String apellido, Date nacimiento) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.nacimiento = nacimiento;

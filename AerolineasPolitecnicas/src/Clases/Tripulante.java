@@ -5,16 +5,16 @@ import java.util.HashSet;
 
 public class Tripulante extends Persona{
     private HashSet<Modelo>modelos = new HashSet<>();
-    private HashSet<String>idiomas = new HashSet<>();
+    private HashSet<Idioma>idiomas = new HashSet<>();
 
     public Tripulante() {
         super();
         this.modelos.add(new Modelo());
-        this.idiomas.add("Español");
+        this.idiomas.add(new Idioma());
     }
 
-    public Tripulante(String nombre, String apellido, Date nacimiento, int dni, HashSet<Modelo> modelos, HashSet<String> idiomas) {
-        super(nombre, apellido, nacimiento, dni);
+    public Tripulante(int dni,String nombre, String apellido, Date nacimiento, HashSet<Modelo> modelos, HashSet<Idioma> idiomas) {
+        super(dni,nombre, apellido, nacimiento);
         this.modelos = modelos;
         this.idiomas = idiomas;
     }
@@ -27,11 +27,11 @@ public class Tripulante extends Persona{
         this.modelos = modelos;
     }
 
-    public HashSet<String> getIdiomas() {
+    public HashSet<Idioma> getIdiomas() {
         return idiomas;
     }
 
-    public void setIdiomas(HashSet<String> idiomas) {
+    public void setIdiomas(HashSet<Idioma> idiomas) {
         this.idiomas = idiomas;
     }
 
