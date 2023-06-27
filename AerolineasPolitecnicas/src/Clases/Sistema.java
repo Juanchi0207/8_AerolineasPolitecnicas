@@ -259,4 +259,84 @@ public class Sistema {
         }
     }
 
+    public void PasajerosXVuelo(int num) throws SQLException{
+        baseDeDatos.pasajerosXVuelo(num);
+    }
+
+    public void PasajeroMasJoven() throws SQLException{
+        Date joven = new Date();
+        Pasajero pasajero = new Pasajero();
+        for (Vuelo v: listaVuelos) {
+            for(Pasajero p: v.getPasajeros()){
+                if(joven.after(p.getNacimiento())){
+                    joven = p.getNacimiento();
+                    pasajero = p;
+                }
+            }
+            System.out.println("Pasajero mas joven: " + pasajero.toString());
+        }
+    }
+
+    public void NoTripulacionMinima(){
+        int cantidadMinima = 0;
+        System.out.println("Vuelos que no alcanzan la cant. de tripulantes: ");
+        for (Vuelo v: listaVuelos) {
+            cantidadMinima = v.getAvion().getCantidadTripulacion();
+            if(v.getTripulantes().size() < cantidadMinima){
+                System.out.println(v.getIdVuelo());
+            }
+        }
+    }
+
+    public void personasNoAutorizadas() throws SQLException{
+        baseDeDatos.vuelosXtripNoAutorizados(listaVuelos, listaTripulantes);
+    }
+
+    public void reglaRota(Date fecha){
+        int cont = 0;
+        System.out.println("Tripulantes: ");
+        for (Persona t: listaTripulantes) {
+            for(Vuelo v: listaVuelos){
+                if(v.getFecha() == fecha){
+                    if(v.getTripulantes().contains(t)){
+                        cont++;
+                        if(cont > 1){
+                            System.out.println(t.toString());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void pasarVuelo(Persona persona, int idVuelo) throws SQLException{
+        if(persona instanceof Pasajero){
+            baseDeDatos.cambiarvueloPasajero(persona, idVuelo);
+        } else {
+            System.out.println("Esta persona no es un pasajero.");
+        }
+    }
+
+    public void idiomasHablados(){
+        for (Vuelo v: listaVuelos) {
+            System.out.println("Vuelo: " + v.getIdVuelo());
+            for (Persona t: listaTripulantes) {
+                t.toString();
+            }
+            System.out.println("--------------------------");
+        }
+    }
+
+    public void avionMasNuevo(){
+        Date nuevo= new Date();
+        int serie = 0;
+        for (Avion a: listaAviones) {
+            if(nuevo.after(a.getFechaFabricacion())){
+                nuevo = a.getFechaFabricacion();
+                serie = a.getNumeroSerie();
+            }
+        }
+        System.out.println("Num. de Serie: " + serie);
+    }
+
 }

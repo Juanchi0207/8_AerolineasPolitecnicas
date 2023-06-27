@@ -1,4 +1,6 @@
 package Clases;
+import Conector.AccesoBaseDeDatos;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +12,7 @@ public class Vuelo {
     private String origen;
     private String destino;
     private HashSet<Tripulante>tripulantes = new HashSet<Tripulante>();
-    private HashSet<Pasajero>pasajeros = new HashSet<Pasajero>(                                                              );
+    private HashSet<Pasajero>pasajeros = new HashSet<>();
     private HashMap<Tripulante, Sector>area = new HashMap<>();
 
 
@@ -24,6 +26,9 @@ public class Vuelo {
         this.tripulantes = tripulantes;
         this.pasajeros = pasajeros;
         this.area = area;
+    }
+
+    public Vuelo() {
     }
 
     public int getIdVuelo() {

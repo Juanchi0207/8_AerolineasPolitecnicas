@@ -29,4 +29,12 @@ public class Idioma {
     public void setNombre_idioma(String nombre_idioma) {
         this.nombre_idioma = nombre_idioma;
     }
+
+    @Override
+    public String toString() {
+        return "Idioma{" +
+                "idioma=" + idioma +
+                ", nombre_idioma='" + nombre_idioma + '\'' +
+                '}';
+    }
 }

@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 
 
-public class                                    AccesoBaseDeDatos {
+public class AccesoBaseDeDatos {
 
     private Connection conexion;
     private String nombreBaseDeDatos;
@@ -30,9 +30,7 @@ public class                                    AccesoBaseDeDatos {
         /* línea alternativa para los que usan windows:
         String url = "jdbc:mysql://localhost/" + this.nombreBaseDeDatos + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
         */
-
         try {
-
             conexion = DriverManager.getConnection(url, user, password);
 
             if (conexion != null) {
@@ -129,12 +127,12 @@ public class                                    AccesoBaseDeDatos {
 
     } //hay que cambiar un par de cosas
 
-    public void cambiarvueloPasajero() throws SQLException {
+    public void cambiarvueloPasajero(Persona persona, int idVuelo) throws SQLException {
+        Vuelo vuelo = new Vuelo();
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        int idPasajero =46679230;
-        int idVuelo = 1;
+        int idPasajero = persona.getDni();
         int estado=0;
         ResultSet resultado=db.obtenerResultado("call CambioPasaje("+idPasajero + "," + idVuelo + ");");
 
@@ -161,7 +159,7 @@ public class                                    AccesoBaseDeDatos {
 
     }
 
-    public void pasajerosXVuelo() throws SQLException{
+    public void pasajerosXVuelo(int numVuelo) throws SQLException{
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 

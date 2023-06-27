@@ -43,6 +43,14 @@ public class Avion extends Modelo{
         this.patente = patente;
     }
 
+    public Date getFechaFabricacion() {
+        return fechaFabricacion;
+    }
+
+    public void setFechaFabricacion(Date fechaFabricacion) {
+        this.fechaFabricacion = fechaFabricacion;
+    }
+
     @Override
     public String toString() {
         return "Avion{" +
