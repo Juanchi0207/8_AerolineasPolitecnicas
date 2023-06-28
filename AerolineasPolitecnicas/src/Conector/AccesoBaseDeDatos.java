@@ -1,7 +1,6 @@
 package Conector;
 
 import Clases.*;
-import com.mysql.cj.jdbc.result.ResultSetMetaData;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ public class AccesoBaseDeDatos {
         this.nombreBaseDeDatos = nombreBaseDeDatos;
         this.nombreTabla = nombreTabla;
     }
+
     public AccesoBaseDeDatos(String nombreBaseDeDatos) {
         this.nombreBaseDeDatos = nombreBaseDeDatos;
     }
@@ -57,43 +57,37 @@ public class AccesoBaseDeDatos {
         }
     }
 
-    public ResultSet obtenerResultado(String consulta){
-
+    public ResultSet obtenerResultado(String consulta) {
         ResultSet resultado = null;
-
         try {
-
             Statement sentencia = this.conexion.createStatement();
             resultado = sentencia.executeQuery(consulta);
-
-
         } catch (SQLException excepcion) {
             excepcion.printStackTrace();
         }
-
         return resultado;
     }
 
-    public ResultSet seleccionarTodo(){
+    public ResultSet seleccionarTodo() {
         String consulta = "SELECT * FROM " + this.nombreTabla;
         ResultSet resultado = this.obtenerResultado(consulta);
         return resultado;
     }
 
     public void imprimirDatos(ResultSet resultado1) throws SQLException {
-        ArrayList<String>columnas=obtenerNombresColumnas(resultado1);
-        String cols="";
-        for (int i=0;i<columnas.size();i++){
-            cols=cols+columnas.get(i)+ " ";
+        ArrayList<String> columnas = obtenerNombresColumnas(resultado1);
+        String cols = "";
+        for (int i = 0; i < columnas.size(); i++) {
+            cols = cols + columnas.get(i) + " ";
         }
         System.out.println(cols);
         try {
 
             while (resultado1.next()) {
-                String fila="";
-                for (int i=1; i<=columnas.size();i++){
+                String fila = "";
+                for (int i = 1; i <= columnas.size(); i++) {
                     String temp = resultado1.getString(i);
-                    fila=fila + temp + " ";
+                    fila = fila + temp + " ";
                 }
                 System.out.println(fila);
 
@@ -108,33 +102,34 @@ public class AccesoBaseDeDatos {
 
 
     public ArrayList<String> obtenerNombresColumnas(ResultSet resultadoConsulta) throws SQLException {
-        ArrayList<String>columnas=new ArrayList<String>();
-        ResultSetMetaData resultadoMeta= (ResultSetMetaData) resultadoConsulta.getMetaData();
-        for (int i=1;i<=resultadoMeta.getColumnCount();i++){
+        ArrayList<String> columnas = new ArrayList<String>();
+        ResultSetMetaData resultadoMeta = (ResultSetMetaData) resultadoConsulta.getMetaData();
+        for (int i = 1; i <= resultadoMeta.getColumnCount(); i++) {
             columnas.add(resultadoMeta.getColumnName(i));
         }
         return columnas;
     }
 
 
-
     public void llamarPasajeroMasJoven() throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        ResultSet resultado=db.obtenerResultado("select idvuelo,pasajeroMasJoven(idvuelo) from vuelo where pasajeroMasJoven(idvuelo)>0;");
-            db.imprimirDatos(resultado);
+        ResultSet resultado = db.obtenerResultado("select idvuelo,pasajeroMasJoven(idvuelo) from vuelo where pasajeroMasJoven(idvuelo)>0;");
+        db.imprimirDatos(resultado);
 
-    } //hay que cambiar un par de cosas
+    }
 
+
+    // EJ f
     public void cambiarvueloPasajero(Persona persona, int idVuelo) throws SQLException {
         Vuelo vuelo = new Vuelo();
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
         int idPasajero = persona.getDni();
-        int estado=0;
-        ResultSet resultado=db.obtenerResultado("call CambioPasaje("+idPasajero + "," + idVuelo + ");");
+        int estado = 0;
+        ResultSet resultado = db.obtenerResultado("call CambioPasaje(" + idPasajero + "," + idVuelo + ");");
 
     }
 
@@ -142,7 +137,7 @@ public class AccesoBaseDeDatos {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        ResultSet resultado=db.obtenerResultado("select num_serie from avion where fecha_fabricacion=(select max(fecha_fabricacion) from avion);" );
+        ResultSet resultado = db.obtenerResultado("select num_serie from avion where fecha_fabricacion=(select max(fecha_fabricacion) from avion);");
         db.imprimirDatos(resultado);
 
     }
@@ -151,26 +146,22 @@ public class AccesoBaseDeDatos {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        ResultSet resultado=db.obtenerResultado("select distinct(idioma),idvuelo from idioma join " +
+        ResultSet resultado = db.obtenerResultado("select distinct(idioma),idvuelo from idioma join " +
                 "idioma_has_tripulante on idioma_ididioma = ididioma join tripulante on tripulante_persona_dni=persona_dni " +
                 "join tripulante_has_vuelo on persona_dni=tripulante_has_vuelo.tripulante_persona_dni join vuelo " +
-                "on vuelo_idvuelo=idvuelo order by idvuelo,idioma;" );
+                "on vuelo_idvuelo=idvuelo order by idvuelo,idioma;");
         db.imprimirDatos(resultado);
 
     }
 
-    public void pasajerosXVuelo(int numVuelo) throws SQLException{
-        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
-        db.conectar("alumno", "alumnoipm");
+    public void pasajerosXVuelo() throws SQLException {
 
-        ResultSet resultado = db.obtenerResultado("call listarPasajerosXvuelo();");
-
-        db.imprimirDatos(resultado);
     }
 
 
 
-    public void cantidadMinimaTripulantes() throws SQLException{
+    // EJ c
+    public void cantidadMinimaTripulantes() throws SQLException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
@@ -180,6 +171,8 @@ public class AccesoBaseDeDatos {
                 "having count(*)<cant_trip_necesaria;");
         db.imprimirDatos(resultado);
     }
+}
+
 
     /*
     Colocar mysql-connector-java-8.0.21.jar en una carpeta llamada lib
@@ -187,29 +180,4 @@ public class AccesoBaseDeDatos {
     File -> Project Structure -> + -> JARs y directorios ->
     seleccionar mongo-java-driver -> tildar -> aplicar -> ok
     */
-    public void vuelosXtripNoAutorizados(HashSet<Vuelo>listaVuelos,HashSet<Persona>listaTripulantes){
-        for (Vuelo vuelo:listaVuelos){
-            boolean estado=false;
-            Avion avion=vuelo.getAvion();
-            String modelo=avion.getModelo();
-            HashSet<Tripulante>tripulantes=vuelo.getTripulantes();
-            for (Tripulante trips:tripulantes){
-                int dni=trips.getDni();
-                for (Persona trip1:listaTripulantes){
-                    if(trip1.getDni()==dni){
-                        HashSet<Modelo>modelos=((Tripulante) trip1).getModelos();
-                        for (Modelo modelo1:modelos){
-                            if (modelo1.getModelo()==modelo){
-                                estado=true;
-                            }
-                        }
-                    }
-                }
-            }
-            if (estado==true){
-                System.out.println(vuelo.getIdVuelo());
-            }
 
-        }
-    }
-}

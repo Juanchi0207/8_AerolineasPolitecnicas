@@ -4,9 +4,6 @@
 -- ------------------------------------------------------
 -- Server version	8.0.33-0ubuntu0.22.04.2
 
-create database AerolineasPolitecnicas;
-use AerolineasPolitecnicas;
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -278,7 +275,7 @@ CREATE TABLE `tripulante_has_vuelo` (
 
 LOCK TABLES `tripulante_has_vuelo` WRITE;
 /*!40000 ALTER TABLE `tripulante_has_vuelo` DISABLE KEYS */;
-INSERT INTO `tripulante_has_vuelo` VALUES (46111111,1,1),(46111111,2,1),(46222222,1,1),(46222222,3,2);
+INSERT INTO `tripulante_has_vuelo` VALUES (46111111,1,1),(46111111,2,1),(46222222,1,1),(46222222,4,1),(46222222,3,2);
 /*!40000 ALTER TABLE `tripulante_has_vuelo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -307,7 +304,7 @@ CREATE TABLE `vuelo` (
 
 LOCK TABLES `vuelo` WRITE;
 /*!40000 ALTER TABLE `vuelo` DISABLE KEYS */;
-INSERT INTO `vuelo` VALUES (1,1,'2023-06-12','CABA','Miami'),(2,1,'2023-06-16','Miami','CABA'),(3,1,'2023-06-19','CABA','Miami'),(4,2,'2023-07-25','CABA','Londres'),(5,2,'2023-07-28','Londres','CABA'),(6,3,'2023-07-14','CABA','Washington DC'),(7,3,'2023-07-19','Washington DC','CABA'),(8,4,'2023-07-02','CABA','Ibiza'),(9,4,'2023-07-12','Ibiza','CABA');
+INSERT INTO `vuelo` VALUES (1,1,'2023-06-12','CABA','Miami'),(2,1,'2023-06-16','Miami','CABA'),(3,1,'2023-06-19','CABA','Miami'),(4,2,'2023-07-25','CABA','Londres');
 /*!40000 ALTER TABLE `vuelo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -335,7 +332,7 @@ CREATE TABLE `vuelo_has_pasajero` (
 
 LOCK TABLES `vuelo_has_pasajero` WRITE;
 /*!40000 ALTER TABLE `vuelo_has_pasajero` DISABLE KEYS */;
-INSERT INTO `vuelo_has_pasajero` VALUES (2,46679230),(3,46679230),(2,46878279),(3,46878279);
+INSERT INTO `vuelo_has_pasajero` VALUES (2,46679230),(3,46679230),(1,46878279),(2,46878279),(3,46878279);
 /*!40000 ALTER TABLE `vuelo_has_pasajero` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -497,8 +494,10 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`alumno`@`localhost` PROCEDURE `listarPasajerosXvuelo`()
 begin
-	select vuelo_idvuelo ,pasajero_persona_dni 
-    from vuelo_has_pasajero order by vuelo_idvuelo;
+	select vuelo_idvuelo,dni,nombre,apellido,fecha_nacimiento,vip,necesidades_especiales,idvuelo,avion_patente1,fecha_vuelo,origen,destino 
+    from vuelo_has_pasajero 
+    join pasajero on persona_dni=pasajero_persona_dni 
+    join persona on dni=persona_dni join vuelo on vuelo_idvuelo=idvuelo order by vuelo_idvuelo;
 end ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -537,4 +536,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-06-23 17:31:46
+-- Dump completed on 2023-06-28  9:55:29

@@ -132,10 +132,9 @@ public class Sistema {
 
                     while (resultado2.next()){
                         int dniTrip=resultado2.getInt("tripulante_persona_dni");
-                        Tripulante tripulante=new Tripulante();
                         for(Persona trip:listaTripulantes){
                             if (trip.getDni()==dniTrip){
-                                tripulante=(Tripulante) trip;
+                                Tripulante tripulante=(Tripulante) trip;
                                 tripulantesVuelo.add(tripulante);
                             }
                         }
@@ -216,7 +215,6 @@ public class Sistema {
         try {
             while (resultado1.next()) {
                 int dni= resultado1.getInt("dni");
-                System.out.println(dni);
                 String nombre=resultado1.getString("nombre");
                 String apellido=resultado1.getString("apellido");
                 Date fechaNacimiento=resultado1.getDate("fecha_nacimiento");
@@ -232,8 +230,7 @@ public class Sistema {
                     while (resultado2.next()){
                         String mod=resultado2.getString("modelo_modelo");
                         for(Modelo modelo1:listaModelos){
-                            if (mod==modelo1.getModelo()){
-                                System.out.println(modelo1.getModelo());
+                            if (mod.equals(modelo1.getModelo())){
                                 modeloNuevo.add(modelo1);
                             }
                         }
@@ -259,39 +256,62 @@ public class Sistema {
         }
     }
 
-    public void PasajerosXVuelo(int num) throws SQLException{
-        baseDeDatos.pasajerosXVuelo(num);
+
+    // EJ a
+    public void PasajerosXVuelo() throws SQLException{
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        ResultSet resultado = db.obtenerResultado("call listarPasajerosXvuelo();");
+
+        db.imprimirDatos(resultado);
     }
 
+
+    // EJ b
     public void PasajeroMasJoven() throws SQLException{
-        Date joven = new Date();
         Pasajero pasajero = new Pasajero();
         for (Vuelo v: listaVuelos) {
+            Date joven = null;
             for(Pasajero p: v.getPasajeros()){
-                if(joven.after(p.getNacimiento())){
+                if(joven==null||p.getNacimiento().compareTo(joven)<-1){
                     joven = p.getNacimiento();
                     pasajero = p;
                 }
             }
-            System.out.println("Pasajero mas joven: " + pasajero.toString());
+            System.out.println("Pasajero mas joven en el vuelo "+ v.getIdVuelo() + " es " + pasajero.getDni());
         }
     }
 
-    public void NoTripulacionMinima(){
-        int cantidadMinima = 0;
-        System.out.println("Vuelos que no alcanzan la cant. de tripulantes: ");
-        for (Vuelo v: listaVuelos) {
-            cantidadMinima = v.getAvion().getCantidadTripulacion();
-            if(v.getTripulantes().size() < cantidadMinima){
-                System.out.println(v.getIdVuelo());
+    // EJ d
+    public void vuelosXtripNoAutorizados(){
+        for (Vuelo vuelo:listaVuelos){
+            boolean estado=false;
+            Avion avion=vuelo.getAvion();
+            Modelo modelo=avion.getModelo();
+            HashSet<Tripulante>tripulantes=vuelo.getTripulantes();
+            for (Tripulante trips:tripulantes){
+                int dni=trips.getDni();
+                for (Persona trip1:listaTripulantes){
+                    if(trip1.getDni()==dni){
+                        HashSet<Modelo>modelos=((Tripulante) trip1).getModelos();
+                        for (Modelo modelo1:modelos){
+                            if (modelo1.getModelo().equals(modelo)){
+                                estado=true;
+                            }
+                        }
+                    }
+                }
             }
+            if (estado==true){
+                System.out.println(vuelo.getIdVuelo());
+            }
+
         }
     }
 
-    public void personasNoAutorizadas() throws SQLException{
-        baseDeDatos.vuelosXtripNoAutorizados(listaVuelos, listaTripulantes);
-    }
 
+    // EJ e
     public void reglaRota(Date fecha){
         int cont = 0;
         System.out.println("Tripulantes: ");
@@ -309,29 +329,62 @@ public class Sistema {
         }
     }
 
-    public void pasarVuelo(Persona persona, int idVuelo) throws SQLException{
-        if(persona instanceof Pasajero){
-            baseDeDatos.cambiarvueloPasajero(persona, idVuelo);
-        } else {
-            System.out.println("Esta persona no es un pasajero.");
-        }
-    }
-
+    // EJ g
     public void idiomasHablados(){
         for (Vuelo v: listaVuelos) {
             System.out.println("Vuelo: " + v.getIdVuelo());
-            for (Persona t: listaTripulantes) {
-                t.toString();
+            boolean ingles = false;
+            boolean castellano= false;
+            boolean portugues=false;
+            boolean aleman= false;
+            boolean italiano=false;
+            for (Persona t: v.getTripulantes()) {
+                HashSet<Idioma>idomasT=((Tripulante)t).getIdiomas();
+                for (Idioma idioma1:idomasT){
+                    if (idioma1.getNombre_idioma().equals("Ingles")){
+                        ingles=true;
+                    }
+                    if (idioma1.getNombre_idioma().equals("Castellano")){
+                        castellano=true;
+                    }
+                    if (idioma1.getNombre_idioma().equals("Portugues")){
+                        portugues=true;
+                    }
+                    if (idioma1.getNombre_idioma().equals("Aleman")){
+                        aleman=true;
+                    }
+                    if (idioma1.getNombre_idioma().equals("Italiano")){
+                        italiano=true;
+                    }
+                }
+
             }
-            System.out.println("--------------------------");
+            String idiomasHablados="";
+            if (ingles==true){
+                idiomasHablados=idiomasHablados+"Ingles ";
+            }
+            if (castellano==true){
+                idiomasHablados=idiomasHablados+"Castellano ";
+            }
+            if (portugues==true){
+                idiomasHablados=idiomasHablados+"Portugues ";
+            }
+            if (aleman==true){
+                idiomasHablados=idiomasHablados+"Aleman ";
+            }
+            if (italiano==true){
+                idiomasHablados=idiomasHablados+"Italiano ";
+            }
+            System.out.println(idiomasHablados);
         }
     }
 
+    // EJ h
     public void avionMasNuevo(){
-        Date nuevo= new Date();
+        Date nuevo= null;
         int serie = 0;
         for (Avion a: listaAviones) {
-            if(nuevo.after(a.getFechaFabricacion())){
+            if(nuevo==null||nuevo.compareTo(a.getFechaFabricacion())<1){
                 nuevo = a.getFechaFabricacion();
                 serie = a.getNumeroSerie();
             }
@@ -339,4 +392,6 @@ public class Sistema {
         System.out.println("Num. de Serie: " + serie);
     }
 
+
 }
+

@@ -2,29 +2,30 @@ package Clases;
 
 import java.util.Date;
 
-public class Avion extends Modelo{
+public class Avion{
     private int patente;
-    private Modelo modelo;
+    private Modelo modeloAvion;
     private int numeroSerie;
     private Date fechaFabricacion;
 
     public Avion(int patente, Modelo modelo, int numeroSerie, Date fechaFabricacion) {
         this.patente = patente;
-        this.modelo = modelo;
+        this.modeloAvion = modelo;
         this.numeroSerie = numeroSerie;
         this.fechaFabricacion = fechaFabricacion;
     }
 
-    public Avion(String modelo, int cantidadTripulacion, int cantidadPasajeros, int patente, Modelo modelo1, int numeroSerie, Date fechaFabricacion) {
-        super(modelo, cantidadTripulacion, cantidadPasajeros);
-        this.patente = patente;
-        this.modelo = modelo1;
-        this.numeroSerie = numeroSerie;
-        this.fechaFabricacion = fechaFabricacion;
-    }
 
     public Avion() {
 
+    }
+
+    public Modelo getModelo() {
+        return modeloAvion;
+    }
+
+    public void setModelo(Modelo modelo) {
+        this.modeloAvion = modelo;
     }
 
     public int getNumeroSerie() {

@@ -4,6 +4,7 @@ import Conector.AccesoBaseDeDatos;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashSet;
 
 public class Main {
@@ -18,20 +19,15 @@ public class Main {
         sistema.cargarDatosTripulantes(db.obtenerResultado(("Select dni,nombre,apellido,fecha_nacimiento,modelo,cant_pasajeros,cant_trip_necesaria, ididioma, idioma from persona join tripulante on dni=persona_dni join idioma_has_tripulante on tripulante_persona_dni=tripulante.persona_dni join idioma on ididioma= idioma_ididioma join modelo_has_tripulante on modelo_has_tripulante.tripulante_persona_dni=persona_dni join modelo on modelo=modelo_modelo;")));
         sistema.cargarDatosVuelo(db.obtenerResultado("Select * from vuelo;"));
 
-        for (Persona trip: sistema.getListaTripulantes()){
-            HashSet<Modelo>mod=((Tripulante) trip).getModelos();
-            for (Modelo modelo:mod){
-                System.out.println(modelo.getModelo());
-            }
-        }
-        // a db.pasajerosXVuelo();
-        // b db.llamarPasajeroMasJoven();
+
+        // a sistema.PasajerosXVuelo();
+        // b sistema.PasajeroMasJoven();
         // c db.cantidadMinimaTripulantes();
-        // db.vuelosXtripNoAutorizados(sistema.getListaVuelos(),sistema.getListaTripulantes());
+        // d sistema.vuelosXtripNoAutorizados(); NO FUNCIONA
+        // e sistema.reglaRota(new Date()); NO FUNCIONA
         // f db.cambiarvueloPasajero();
-        // g db.idiomasHablados();
-        // h db.avionMasNuevo();
-        sistema.PasajerosXVuelo(7);
+        // g sistema.idiomasHablados();
+        // h sistema.avionMasNuevo();
     }
 }
 

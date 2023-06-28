@@ -11,5 +11,14 @@
     <orderEntry type="library" name="mysql-connector-j-8.0.333" level="project" />
     <orderEntry type="library" name="mysql-connector-j-8.0.332" level="project" />
     <orderEntry type="library" name="mysql-connector-j-8.0.33" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/AerolineasPolitecnicas/src/Conector/lib/mysql-connector-j-8.0.33.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

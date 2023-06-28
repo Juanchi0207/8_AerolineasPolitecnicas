@@ -1,28 +1,28 @@
 package Clases;
 
 public class Modelo {
-    private String modelo;
+    private String modelo_nom;
     private int cantidadTripulacion;
     private int cantidadPasajeros;
 
     public Modelo() {
-        this.modelo = "Test";
+        this.modelo_nom = "Test";
         this.cantidadPasajeros = 0;
         this.cantidadTripulacion = 0;
     }
 
     public Modelo(String modelo, int cantidadTripulacion, int cantidadPasajeros) {
-        this.modelo = modelo;
+        this.modelo_nom = modelo;
         this.cantidadTripulacion = cantidadTripulacion;
         this.cantidadPasajeros = cantidadPasajeros;
     }
 
     public String getModelo() {
-        return modelo;
+        return modelo_nom;
     }
 
     public void setModelo(String modelo) {
-        this.modelo = modelo;
+        this.modelo_nom = modelo;
     }
 
     public int getCantidadTripulacion() {
@@ -44,7 +44,7 @@ public class Modelo {
     @Override
     public String toString() {
         return "Modelo{" +
-                "modelo='" + modelo + '\'' +
+                "modelo='" + modelo_nom + '\'' +
                 ", cantidadTripulacion=" + cantidadTripulacion +
                 ", cantidadPasajeros=" + cantidadPasajeros +
                 '}';
