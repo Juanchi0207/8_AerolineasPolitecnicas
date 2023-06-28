@@ -282,7 +282,10 @@ public class Sistema {
             System.out.println("Pasajero mas joven en el vuelo "+ v.getIdVuelo() + " es " + pasajero.getDni());
         }
     }
+    // EJ c
+    public void noTripMinima(){
 
+    }
     // EJ d
     public void vuelosXtripNoAutorizados(){
         for (Vuelo vuelo:listaVuelos){
@@ -317,16 +320,33 @@ public class Sistema {
         System.out.println("Tripulantes: ");
         for (Persona t: listaTripulantes) {
             for(Vuelo v: listaVuelos){
-                if(v.getFecha() == fecha){
+                if(v.getFecha()==fecha){
+                    System.out.println("entro");
+
                     if(v.getTripulantes().contains(t)){
                         cont++;
                         if(cont > 1){
                             System.out.println(t.toString());
+                        }else {
+
                         }
                     }
+
                 }
+
             }
+
         }
+    }
+
+    // EJ f
+    public void cambiarPasaje() throws SQLException{
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        ResultSet resultado = db.obtenerResultado("call cambioPasaje();");
+
+        db.imprimirDatos(resultado);
     }
 
     // EJ g

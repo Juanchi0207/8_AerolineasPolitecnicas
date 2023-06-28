@@ -4,6 +4,7 @@ import Conector.AccesoBaseDeDatos;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -19,12 +20,11 @@ public class Main {
         sistema.cargarDatosTripulantes(db.obtenerResultado(("Select dni,nombre,apellido,fecha_nacimiento,modelo,cant_pasajeros,cant_trip_necesaria, ididioma, idioma from persona join tripulante on dni=persona_dni join idioma_has_tripulante on tripulante_persona_dni=tripulante.persona_dni join idioma on ididioma= idioma_ididioma join modelo_has_tripulante on modelo_has_tripulante.tripulante_persona_dni=persona_dni join modelo on modelo=modelo_modelo;")));
         sistema.cargarDatosVuelo(db.obtenerResultado("Select * from vuelo;"));
 
-
         // a sistema.PasajerosXVuelo();
         // b sistema.PasajeroMasJoven();
         // c db.cantidadMinimaTripulantes();
-        // d sistema.vuelosXtripNoAutorizados(); NO FUNCIONA
-        // e sistema.reglaRota(new Date()); NO FUNCIONA
+        // sistema.vuelosXtripNoAutorizados();
+         sistema.reglaRota(new Date());
         // f db.cambiarvueloPasajero();
         // g sistema.idiomasHablados();
         // h sistema.avionMasNuevo();

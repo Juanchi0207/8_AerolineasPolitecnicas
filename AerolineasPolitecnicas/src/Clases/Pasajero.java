@@ -18,7 +18,6 @@ public class Pasajero extends Persona{
         this.vip = vip;
         this.especial = especial;
     }
-
     public boolean isVip() {
         return vip;
     }

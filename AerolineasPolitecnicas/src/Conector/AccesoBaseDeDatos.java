@@ -165,7 +165,7 @@ public class AccesoBaseDeDatos {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        ResultSet resultado = db.obtenerResultado("select idvuelo,cant_trip_necesaria as tripulacionNecesaria,count(*) as tripulacionActual from vuelo join avion on patente=avion_patente1 \n" +
+        ResultSet resultado = db.obtenerResultado("select idvuelo as IDvuelo ,cant_trip_necesaria as TripulacionNecesaria ,count(*) as TripulacionActual from vuelo join avion on patente=avion_patente1 \n" +
                 "join modelo on modelo.modelo=avion.modelo_modelo\n" +
                 "join tripulante_has_vuelo on vuelo_idvuelo=idvuelo group by idvuelo\n" +
                 "having count(*)<cant_trip_necesaria;");
