@@ -34,9 +34,9 @@ public class AccesoBaseDeDatos {
             conexion = DriverManager.getConnection(url, user, password);
 
             if (conexion != null) {
-                System.out.println("Se ha conectado exitosamente con la base de datos");
+                //System.out.println("Se ha conectado exitosamente con la base de datos");
             } else {
-                System.out.println("No se ha podido conectar con la base de datos");
+               System.out.println("No se ha podido conectar con la base de datos");
             }
 
         } catch (SQLException excepcion) {
@@ -120,17 +120,34 @@ public class AccesoBaseDeDatos {
 
     }
 
+    public void vuelosXtripNoAutorizados() throws SQLException {
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        db.obtenerResultado("call vuelosXtripNoAutorizado(@vuelos)");
+        ResultSet resultado= db.obtenerResultado("select @vuelos as vuelos_con_personas_no_autorizadas;");
+        db.imprimirDatos(resultado);
+    }
+
+    // EJ e
+
+    public void reglaRota() throws SQLException {
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        db.obtenerResultado("call reglaRota(@tripulantes)");
+        ResultSet resultado= db.obtenerResultado("select @tripulantes as Tripulantes_que_no_cumplen;");
+        db.imprimirDatos(resultado);
+    }
+
 
     // EJ f
-    public void cambiarvueloPasajero(Persona persona, int idVuelo) throws SQLException {
+    public void cambiarvueloPasajero(int dni, int idVuelo) throws SQLException {
         Vuelo vuelo = new Vuelo();
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        int idPasajero = persona.getDni();
-        int estado = 0;
-        ResultSet resultado = db.obtenerResultado("call CambioPasaje(" + idPasajero + "," + idVuelo + ");");
-
+        ResultSet resultado = db.obtenerResultado("call CambioPasaje(" + dni + "," + idVuelo + ");");
     }
 
     public void avionMasNuevo() throws SQLException {
@@ -151,10 +168,6 @@ public class AccesoBaseDeDatos {
                 "join tripulante_has_vuelo on persona_dni=tripulante_has_vuelo.tripulante_persona_dni join vuelo " +
                 "on vuelo_idvuelo=idvuelo order by idvuelo,idioma;");
         db.imprimirDatos(resultado);
-
-    }
-
-    public void pasajerosXVuelo() throws SQLException {
 
     }
 

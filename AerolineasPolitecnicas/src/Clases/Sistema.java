@@ -286,58 +286,6 @@ public class Sistema {
     public void noTripMinima(){
 
     }
-    // EJ d
-    public void vuelosXtripNoAutorizados(){
-        for (Vuelo vuelo:listaVuelos){
-            boolean estado=false;
-            Avion avion=vuelo.getAvion();
-            Modelo modelo=avion.getModelo();
-            HashSet<Tripulante>tripulantes=vuelo.getTripulantes();
-            for (Tripulante trips:tripulantes){
-                int dni=trips.getDni();
-                for (Persona trip1:listaTripulantes){
-                    if(trip1.getDni()==dni){
-                        HashSet<Modelo>modelos=((Tripulante) trip1).getModelos();
-                        for (Modelo modelo1:modelos){
-                            if (modelo1.getModelo().equals(modelo)){
-                                estado=true;
-                            }
-                        }
-                    }
-                }
-            }
-            if (estado==true){
-                System.out.println(vuelo.getIdVuelo());
-            }
-
-        }
-    }
-
-
-    // EJ e
-    public void reglaRota(Date fecha){
-        int cont = 0;
-        System.out.println("Tripulantes: ");
-        for (Persona t: listaTripulantes) {
-            for(Vuelo v: listaVuelos){
-                if(v.getFecha()==fecha){
-                    System.out.println("entro");
-
-                    if(v.getTripulantes().contains(t)){
-                        cont++;
-                        if(cont > 1){
-                            System.out.println(t.toString());
-                        }else {
-
-                        }
-                    }
-
-                }
-
-            }
-
-        }
-    }
 
     // EJ f
     public void cambiarPasaje() throws SQLException{

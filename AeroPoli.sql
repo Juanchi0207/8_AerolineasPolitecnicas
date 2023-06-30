@@ -39,7 +39,7 @@ CREATE TABLE `avion` (
 
 LOCK TABLES `avion` WRITE;
 /*!40000 ALTER TABLE `avion` DISABLE KEYS */;
-INSERT INTO `avion` VALUES (1,'Boeing 747',123,'2015-09-13'),(2,'Airbus A318',234,'2017-02-28'),(3,'Airbus A380',345,'2023-06-25'),(4,'Boeing 787 Dreamliner',456,'2020-05-02');
+INSERT INTO `avion` VALUES (1,'Boeing 747',123,'2015-09-13'),(2,'Airbus A318',234,'2017-02-28'),(3,'Airbus A380',345,'2023-06-25'),(4,'Boeing 787 Dreamliner',456,'2020-05-02'),(5,'Boeing 747',500,'2023-06-29');
 /*!40000 ALTER TABLE `avion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -275,7 +275,7 @@ CREATE TABLE `tripulante_has_vuelo` (
 
 LOCK TABLES `tripulante_has_vuelo` WRITE;
 /*!40000 ALTER TABLE `tripulante_has_vuelo` DISABLE KEYS */;
-INSERT INTO `tripulante_has_vuelo` VALUES (46111111,1,1),(46111111,2,1),(46222222,1,1),(46222222,4,1),(46222222,3,2);
+INSERT INTO `tripulante_has_vuelo` VALUES (46111111,1,1),(46111111,2,1),(46222222,1,1),(46222222,4,1),(46222222,5,1),(46222222,6,1),(46222222,3,2);
 /*!40000 ALTER TABLE `tripulante_has_vuelo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -304,7 +304,7 @@ CREATE TABLE `vuelo` (
 
 LOCK TABLES `vuelo` WRITE;
 /*!40000 ALTER TABLE `vuelo` DISABLE KEYS */;
-INSERT INTO `vuelo` VALUES (1,1,'2023-06-12','CABA','Miami'),(2,1,'2023-06-16','Miami','CABA'),(3,1,'2023-06-19','CABA','Miami'),(4,2,'2023-07-25','CABA','Londres');
+INSERT INTO `vuelo` VALUES (1,1,'2023-06-12','CABA','Miami'),(2,1,'2023-06-16','Miami','CABA'),(3,1,'2023-06-19','CABA','Miami'),(4,2,'2023-07-25','CABA','Londres'),(5,3,'2023-06-30','CABA','Uruguay'),(6,4,'2023-06-30','Uruguay','CABA');
 /*!40000 ALTER TABLE `vuelo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -332,7 +332,7 @@ CREATE TABLE `vuelo_has_pasajero` (
 
 LOCK TABLES `vuelo_has_pasajero` WRITE;
 /*!40000 ALTER TABLE `vuelo_has_pasajero` DISABLE KEYS */;
-INSERT INTO `vuelo_has_pasajero` VALUES (2,46679230),(3,46679230),(1,46878279),(2,46878279),(3,46878279);
+INSERT INTO `vuelo_has_pasajero` VALUES (2,46679230),(3,46679230),(2,46878279),(3,46878279),(4,46878279);
 /*!40000 ALTER TABLE `vuelo_has_pasajero` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -526,6 +526,84 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `reglaRota` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`alumno`@`localhost` PROCEDURE `reglaRota`(out tripulantes varchar(300))
+begin
+	declare tripActual int default 0;
+    declare cantVuelos int default 0;
+    declare terminar int default 0;
+    declare cursor1 cursor for select persona_dni from tripulante;
+    DECLARE CONTINUE HANDLER for not found SET terminar=1;
+    set tripulantes= "";
+    open cursor1;
+    bucle:loop
+		fetch cursor1 into tripActual;
+        if terminar=1 then
+			leave bucle;
+		end if;
+        if ((select count(*)from tripulante_has_vuelo 
+        join vuelo on vuelo_idvuelo=idvuelo where tripulante_persona_dni=tripActual 
+        group by fecha_vuelo having count(*)>1 limit 1)>1) then
+        set tripulantes=concat(tripulantes, tripActual, " ");
+        end if;
+    end loop bucle;
+end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `vuelosXtripNoAutorizado` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`alumno`@`localhost` PROCEDURE `vuelosXtripNoAutorizado`(out vuelos varchar(200))
+begin
+    declare terminar boolean default 0;
+    declare vueloActual int default 0;
+    declare trip_actual int default 0;
+    declare ultimoVueloAgregado int default 0;
+    declare mod_vueloActual varchar(45) default "";
+    declare cursor1 cursor for select vuelo_idvuelo, tripulante_persona_dni, modelo_modelo from vuelo join tripulante_has_vuelo on vuelo_idvuelo=idvuelo
+join avion on avion_patente1=patente;
+    DECLARE CONTINUE HANDLER for not found SET terminar=1;
+    set vuelos= "";
+    open cursor1;
+    bucle:loop
+		fetch cursor1 into vueloActual, trip_actual, mod_vueloActual;
+        if terminar=1 then
+			leave bucle;
+		end if;
+        if not exists(select modelo_modelo from modelo_has_tripulante where 
+        tripulante_persona_dni=trip_actual and mod_vueloActual=modelo_modelo) then
+			if (vueloActual!=ultimoVueloAgregado) then
+            set ultimoVueloAgregado=vueloActual;
+            set vuelos=concat(vuelos, vueloActual, " ");
+        end if;
+        end if;
+    end loop bucle;
+    close cursor1;
+end ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -536,4 +614,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-06-28  9:55:29
+-- Dump completed on 2023-06-30 17:17:45
