@@ -1,7 +1,7 @@
 package Clases;
 
 public enum Sector {
-    NORTE("Ala-Norte"), SUR("Ala-Sur"), ESTE("Ala-Este"), OESTE("Ala-Oeste"), GOOFYAHH("Mystery-Flight?¿?");
+    NORTE("Ala-Norte"), SUR("Ala-Sur"), ESTE("Ala-Este"), OESTE("Ala-Oeste");
 
     private String sectorAvion;
 
