@@ -4,9 +4,7 @@ import Conector.AccesoBaseDeDatos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class Sistema {
     private AccesoBaseDeDatos baseDeDatos;
@@ -84,21 +82,17 @@ public class Sistema {
     }
 
     public void cargarDatosPasajero(ResultSet resultado1) throws SQLException {
-        try {
-            while (resultado1.next()) {
-                int dni= resultado1.getInt("dni");
-                String nombre=resultado1.getString("nombre");
-                String apellido=resultado1.getString("apellido");
-                Date fechaNacimiento=resultado1.getDate("fecha_nacimiento");
-                boolean vip=resultado1.getBoolean("vip");
-                boolean necesidades_especiales=resultado1.getBoolean("necesidades_especiales");
-                Pasajero pasajero=new Pasajero(dni,nombre,apellido,fechaNacimiento,vip,necesidades_especiales);
-                listaPasajeros.add(pasajero);
-            }
-            resultado1.close();
-        } catch (SQLException excepcion) {
-            excepcion.printStackTrace();
+        HashMap<Integer,HashMap<String,Object>>datosPasajero=baseDeDatos.obtenerDatosPasajero(resultado1);
+        for(Map.Entry<Integer, HashMap<String,Object>>  pasajeroId: datosPasajero.entrySet()){
+            int dni=pasajeroId.getKey();
+            String nombre=pasajeroId.getValue().get("nombre").toString();
+            String apellido=pasajeroId.getValue().get("apellido").toString();
+            Date nacimiento= (Date) pasajeroId.getValue().get("fecha_nacimiento");
+
+
+
         }
+
     }
 
     public void cargarDatosIdiomas(ResultSet resultado1) throws SQLException {
@@ -122,17 +116,20 @@ public class Sistema {
                 int idvuelo=resultado1.getInt("idvuelo");
                 int patente=resultado1.getInt("avion_patente1");
                 Date fecha=resultado1.getDate("fecha_vuelo");
-                String origen=resultado1.getString("origen");
+                String origen=resultado1.getString("origen"); //obtenemos los datos de un vuelo especifico
                 String destino=resultado1.getString("destino");
-                ResultSet resultado2= baseDeDatos.obtenerResultado("select * from tripulante_has_vuelo where vuelo_idvuelo="+idvuelo+";");
-                ResultSet resultado3= baseDeDatos.obtenerResultado("select * from vuelo_has_pasajero where vuelo_idvuelo= "+idvuelo+";");
+                ResultSet resultado2= baseDeDatos.obtenerResultado("select * from tripulante_has_vuelo where vuelo_idvuelo="+idvuelo+";"); //Obtenemos todos los tripulantes asignados al vuelo que estamos recorriendo
+                ResultSet resultado3= baseDeDatos.obtenerResultado("select * from vuelo_has_pasajero where vuelo_idvuelo= "+idvuelo+";"); // Obtenemos todos los pasajeros asignados al vuelo que estamos recorriendo
                 HashSet<Tripulante>tripulantesVuelo=new HashSet<Tripulante>();
                 HashSet<Pasajero>pasajerosVuelo=new HashSet<Pasajero>();
                 try {
 
                     while (resultado2.next()){
                         int dniTrip=resultado2.getInt("tripulante_persona_dni");
-                        for(Persona trip:listaTripulantes){
+                        for(Persona trip:listaTripulantes){ //teniendo ya la PK de un triplante
+                            // de este nuevo resultset con los asignados a este vuelo,
+                            // recorremos la lista general de tripulantes, agarramos todos sus datos, y lo agregamos
+                            // a la lista de tripulantes del vuelo
                             if (trip.getDni()==dniTrip){
                                 Tripulante tripulante=(Tripulante) trip;
                                 tripulantesVuelo.add(tripulante);
@@ -147,7 +144,8 @@ public class Sistema {
                     while (resultado3.next()){
                         int dniPas=resultado3.getInt("pasajero_persona_dni");
                         Pasajero pasajero=new Pasajero();
-                        for(Persona pas:listaPasajeros){
+                        for(Persona pas:listaPasajeros){ //Realizamos lo mismo que con los tripulantes
+                            // con los pasajeros
                             if (pas.getDni()==dniPas){
                                 pasajero=(Pasajero) pas;
                                 pasajerosVuelo.add(pasajero);
@@ -160,7 +158,9 @@ public class Sistema {
                     throw new RuntimeException(e);
                 }
                 Avion avion=new Avion();
-                for (Avion avion1:listaAviones){
+                for (Avion avion1:listaAviones){ //Para el vuelo que estamos recorriendo,
+                    // obtenemos los datos del avion que se le tiene asignado, buscandolo en
+                    // la lista general de aviones
                     if (avion.getPatente()==patente){
                         avion=avion1;
                     }
@@ -181,7 +181,8 @@ public class Sistema {
                 int cantPasajeros=resultado1.getInt("cant_pasajeros");
                 int cantTripulantes=resultado1.getInt("cant_trip_necesaria");
                 Modelo modelo = new Modelo(nombreModelo,cantPasajeros,cantTripulantes);
-                listaModelos.add(modelo);
+                listaModelos.add(modelo); // Obtenemos los datos de un modelo, y lo agregamos a la lista
+                // general de modelos
             }
             resultado1.close();
         } catch (SQLException excepcion) {
@@ -196,14 +197,16 @@ public class Sistema {
                 String modelos=resultado1.getString("modelo_modelo");
                 int numSerie=resultado1.getInt("num_serie");
                 Date fechaFabricacion=resultado1.getDate("fecha_fabricacion");
-                Modelo modelo=new Modelo();
+                Modelo modelo=new Modelo(); // obtenemos los datos de un avion, y  buscamos el modelo
+                // en la lista general de modelos, para asi agregar todos los datos correspondientes
+                // a este
                 for(Modelo modelo1:listaModelos){
                     if (modelo1.getModelo()==modelos){
                         modelo=modelo1;
                     }
                 }
                 Avion avion=new Avion(patente,modelo,numSerie,fechaFabricacion);
-                listaAviones.add(avion);
+                listaAviones.add(avion); // agregamos el avion con todos sus datos.
             }
             resultado1.close();
         } catch (SQLException excepcion) {
@@ -218,8 +221,9 @@ public class Sistema {
                 String nombre=resultado1.getString("nombre");
                 String apellido=resultado1.getString("apellido");
                 Date fechaNacimiento=resultado1.getDate("fecha_nacimiento");
-                String modelos =resultado1.getString("modelo");
+                String modelos =resultado1.getString("modelo"); // Obtenemos los datos que el tripulante tiene asignados
                 ResultSet resultado2= baseDeDatos.obtenerResultado("Select * from modelo_has_tripulante where tripulante_persona_dni="+dni+";");
+                // seleccionamos todos los modelos que tiene permitidos volar el tripulante actual
                 int ididioma = resultado1.getInt("ididioma");
                 String nombreIdioma =resultado1.getString("idioma");
                 HashSet<Modelo> modeloNuevo=new HashSet<Modelo>();
@@ -229,7 +233,10 @@ public class Sistema {
                 try {
                     while (resultado2.next()){
                         String mod=resultado2.getString("modelo_modelo");
-                        for(Modelo modelo1:listaModelos){
+                        for(Modelo modelo1:listaModelos){ // recorremos los modelos que el tripulante
+                            // puede tripular y los buscamos en la lista general de modelos
+                            // asi agregamos todos los datos correspondientes al hashset modeloNuevo,
+                            // el cual contiene los modelos permitidos
                             if (mod.equals(modelo1.getModelo())){
                                 modeloNuevo.add(modelo1);
                             }
@@ -240,41 +247,31 @@ public class Sistema {
                 }
 
 
-                for(Idioma idioma1:listaIdiomas){
+                for(Idioma idioma1:listaIdiomas){ // realizamos los mismo de antes con los idiomas, para este
+                    //tripulante obtengo sus idiomas, los busco en la lista general y obtengo todos sus datos
                     if (idioma1.getIdioma()==ididioma){
                         idioma=idioma1;
                         idiomaNuevo.add(idioma);
                     }
                 }
                 Tripulante tripulante=new Tripulante(dni,nombre,apellido,fechaNacimiento,modeloNuevo,idiomaNuevo);
-                listaTripulantes.add(tripulante);
+                listaTripulantes.add(tripulante); // creamos y añadimos al tripulante
             }
-
             resultado1.close();
         } catch (SQLException excepcion) {
             excepcion.printStackTrace();
         }
     }
 
-
-    // EJ a
-    public void PasajerosXVuelo() throws SQLException{
-        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
-        db.conectar("alumno", "alumnoipm");
-
-        ResultSet resultado = db.obtenerResultado("call listarPasajerosXvuelo();");
-
-        db.imprimirDatos(resultado);
-    }
-
-
     // EJ b
     public void PasajeroMasJoven() throws SQLException{
         Pasajero pasajero = new Pasajero();
-        for (Vuelo v: listaVuelos) {
+        for (Vuelo v: listaVuelos) { // recorremos los vuelos
             Date joven = null;
-            for(Pasajero p: v.getPasajeros()){
-                if(joven==null||p.getNacimiento().compareTo(joven)<-1){
+            for(Pasajero p: v.getPasajeros()){ // para cada vuelo, obtenemos la lista de pasajeros
+                if(joven==null||p.getNacimiento().compareTo(joven)<-1){ // comparamos sus fechas y
+                    // guardamos la fecha mas reciente, osea la de el mas joven, si es mas joven, redefinimos
+                    // joven y pasajero por los datos del nuevo
                     joven = p.getNacimiento();
                     pasajero = p;
                 }
@@ -282,66 +279,24 @@ public class Sistema {
             System.out.println("Pasajero mas joven en el vuelo "+ v.getIdVuelo() + " es " + pasajero.getDni());
         }
     }
-    // EJ c
-    public void noTripMinima(){
-
-    }
-
-    // EJ f
-    public void cambiarPasaje() throws SQLException{
-        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
-        db.conectar("alumno", "alumnoipm");
-
-        ResultSet resultado = db.obtenerResultado("call cambioPasaje();");
-
-        db.imprimirDatos(resultado);
-    }
-
     // EJ g
     public void idiomasHablados(){
         for (Vuelo v: listaVuelos) {
             System.out.println("Vuelo: " + v.getIdVuelo());
-            boolean ingles = false;
-            boolean castellano= false;
-            boolean portugues=false;
-            boolean aleman= false;
-            boolean italiano=false;
-            for (Persona t: v.getTripulantes()) {
-                HashSet<Idioma>idomasT=((Tripulante)t).getIdiomas();
-                for (Idioma idioma1:idomasT){
-                    if (idioma1.getNombre_idioma().equals("Ingles")){
-                        ingles=true;
-                    }
-                    if (idioma1.getNombre_idioma().equals("Castellano")){
-                        castellano=true;
-                    }
-                    if (idioma1.getNombre_idioma().equals("Portugues")){
-                        portugues=true;
-                    }
-                    if (idioma1.getNombre_idioma().equals("Aleman")){
-                        aleman=true;
-                    }
-                    if (idioma1.getNombre_idioma().equals("Italiano")){
-                        italiano=true;
+            String idiomasHablados="";
+            for(Idioma idioma1:listaIdiomas){
+                boolean encontrado=false;
+                for (Persona t:v.getTripulantes()){
+                    HashSet<Idioma>idiomasT=((Tripulante)t).getIdiomas();
+                    for (Idioma idiomaT:idiomasT){
+                        if (idiomaT.getNombre_idioma().equals(idioma1.getNombre_idioma())){
+                            encontrado=true;
+                        }
                     }
                 }
-
-            }
-            String idiomasHablados="";
-            if (ingles==true){
-                idiomasHablados=idiomasHablados+"Ingles ";
-            }
-            if (castellano==true){
-                idiomasHablados=idiomasHablados+"Castellano ";
-            }
-            if (portugues==true){
-                idiomasHablados=idiomasHablados+"Portugues ";
-            }
-            if (aleman==true){
-                idiomasHablados=idiomasHablados+"Aleman ";
-            }
-            if (italiano==true){
-                idiomasHablados=idiomasHablados+"Italiano ";
+                if (encontrado){
+                    idiomasHablados=idiomasHablados+idioma1.getNombre_idioma()+ " ";
+                }
             }
             System.out.println(idiomasHablados);
         }
@@ -351,8 +306,10 @@ public class Sistema {
     public void avionMasNuevo(){
         Date nuevo= null;
         int serie = 0;
-        for (Avion a: listaAviones) {
-            if(nuevo==null||nuevo.compareTo(a.getFechaFabricacion())<1){
+        for (Avion a: listaAviones) { // recorremos la lista de aviones
+            if(nuevo==null||nuevo.compareTo(a.getFechaFabricacion())<1){ // guardamos la fecha mas reciente
+                // osea la de el avion mas nuevo y redefinimos nuevo y serie con los datos y la fecha
+                // del avion correspondiente
                 nuevo = a.getFechaFabricacion();
                 serie = a.getNumeroSerie();
             }

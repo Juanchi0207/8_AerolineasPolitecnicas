@@ -3,10 +3,8 @@ package Conector;
 import Clases.*;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 
 
 public class AccesoBaseDeDatos {
@@ -42,22 +40,24 @@ public class AccesoBaseDeDatos {
         } catch (SQLException excepcion) {
             excepcion.printStackTrace();
         }
-
     }
 
-    public void modificarTabla(String consulta) {
-        /* INSERT, UPDATE, DELETE */
-        try {
-            Statement sentencia = this.conexion.createStatement();
-            sentencia.executeUpdate(consulta);
-            sentencia.close();
-
-        } catch (SQLException excepcion) {
-            excepcion.printStackTrace();
+    public HashMap<Integer, HashMap<String,Object>>obtenerDatosPasajero(ResultSet resultado) throws SQLException {
+        ArrayList<String>cols=obtenerNombresColumnas(resultado);
+        HashMap<Integer,HashMap<String,Object>>lista=new HashMap<>();
+        while (resultado.next()){
+            HashMap<String,Object>aux1=new HashMap<>();
+            for(int i=1;i<cols.size();i++){
+                aux1.put(cols.get(i),resultado.getString(cols.get(i)));
+            }
+            lista.put(resultado.getInt(cols.get(0)),aux1);
         }
+        return lista;
     }
 
     public ResultSet obtenerResultado(String consulta) {
+        // metodo el cual realiza una consulta que se le pase por parametro y devuelve un resultSet
+        // el cual es una variable que tiene todos los datos de la consulta "comprimidos" por ais decirlo
         ResultSet resultado = null;
         try {
             Statement sentencia = this.conexion.createStatement();
@@ -68,17 +68,14 @@ public class AccesoBaseDeDatos {
         return resultado;
     }
 
-    public ResultSet seleccionarTodo() {
-        String consulta = "SELECT * FROM " + this.nombreTabla;
-        ResultSet resultado = this.obtenerResultado(consulta);
-        return resultado;
-    }
-
     public void imprimirDatos(ResultSet resultado1) throws SQLException {
-        ArrayList<String> columnas = obtenerNombresColumnas(resultado1);
+        // funcion automatizada para imprimir datos de un resultSet
+        ArrayList<String> columnas = obtenerNombresColumnas(resultado1); //llamamos a un metodo
+        // para obtener los nombres de las columnas de este resultSet
         String cols = "";
         for (int i = 0; i < columnas.size(); i++) {
-            cols = cols + columnas.get(i) + " ";
+            cols = cols + columnas.get(i) + " "; // imprimimos los nombres de las columnas
+            // para mantener un ordren y que se sepa que dato es que
         }
         System.out.println(cols);
         try {
@@ -86,7 +83,9 @@ public class AccesoBaseDeDatos {
             while (resultado1.next()) {
                 String fila = "";
                 for (int i = 1; i <= columnas.size(); i++) {
-                    String temp = resultado1.getString(i);
+                    String temp = resultado1.getString(i); // obtenemos los datos de una fila
+                    // respetando la cantidad de columnas que existen y la imprimimos, para asi
+                    // pasar a la siguiente fila
                     fila = fila + temp + " ";
                 }
                 System.out.println(fila);
@@ -103,21 +102,26 @@ public class AccesoBaseDeDatos {
 
     public ArrayList<String> obtenerNombresColumnas(ResultSet resultadoConsulta) throws SQLException {
         ArrayList<String> columnas = new ArrayList<String>();
+        // Creamos un array con los nombres de las columnas
         ResultSetMetaData resultadoMeta = (ResultSetMetaData) resultadoConsulta.getMetaData();
-        for (int i = 1; i <= resultadoMeta.getColumnCount(); i++) {
-            columnas.add(resultadoMeta.getColumnName(i));
+        // instanciamos el resultSet a resultSetMetaData, variable la cual tiene mas metodos que nos
+        // sirven para los nombres y columnas
+        for (int i = 1; i <= resultadoMeta.getColumnCount()/*cantidad de columnas */; i++) {
+            // cabe aclarar que en este caso un for sirve, ya que la cantidad de columnas es una especifica
+            // y se respeta el orden en que aparecen en la consulta, lo unico es que en este caso no se
+            // arranca en 0, sino que se arranca en 1, ya que para las columnas, el 0 no era entre los valores
+            // posibles que puede tomar
+            columnas.add(resultadoMeta.getColumnName(i)/*Nombre de la columna en la pos actual*/);
         }
         return columnas;
     }
 
-
-    public void llamarPasajeroMasJoven() throws SQLException {
+    public void PasajerosXVuelo() throws SQLException{
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
 
-        ResultSet resultado = db.obtenerResultado("select idvuelo,pasajeroMasJoven(idvuelo) from vuelo where pasajeroMasJoven(idvuelo)>0;");
+        ResultSet resultado = db.obtenerResultado("call listarPasajerosXvuelo();");
         db.imprimirDatos(resultado);
-
     }
 
     public void vuelosXtripNoAutorizados() throws SQLException {
@@ -149,29 +153,6 @@ public class AccesoBaseDeDatos {
 
         ResultSet resultado = db.obtenerResultado("call CambioPasaje(" + dni + "," + idVuelo + ");");
     }
-
-    public void avionMasNuevo() throws SQLException {
-        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
-        db.conectar("alumno", "alumnoipm");
-
-        ResultSet resultado = db.obtenerResultado("select num_serie from avion where fecha_fabricacion=(select max(fecha_fabricacion) from avion);");
-        db.imprimirDatos(resultado);
-
-    }
-
-    public void idiomasHablados() throws SQLException {
-        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
-        db.conectar("alumno", "alumnoipm");
-
-        ResultSet resultado = db.obtenerResultado("select distinct(idioma),idvuelo from idioma join " +
-                "idioma_has_tripulante on idioma_ididioma = ididioma join tripulante on tripulante_persona_dni=persona_dni " +
-                "join tripulante_has_vuelo on persona_dni=tripulante_has_vuelo.tripulante_persona_dni join vuelo " +
-                "on vuelo_idvuelo=idvuelo order by idvuelo,idioma;");
-        db.imprimirDatos(resultado);
-
-    }
-
-
 
     // EJ c
     public void cantidadMinimaTripulantes() throws SQLException {
