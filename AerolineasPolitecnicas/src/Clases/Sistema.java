@@ -6,19 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class Sistema {
+public class    Sistema {
     private AccesoBaseDeDatos baseDeDatos;
     private HashSet<Vuelo>listaVuelos;
-    private HashSet<Idioma>listaIdiomas;
     private HashSet<Persona>listaPasajeros;
     private HashSet<Persona>listaTripulantes;
     private HashSet<Modelo>listaModelos;
     private HashSet<Avion>listaAviones;
 
-    public Sistema(AccesoBaseDeDatos baseDeDatos, HashSet<Vuelo> listaVuelos, HashSet<Idioma>listaIdiomas,HashSet<Persona> listaPasajeros, HashSet<Persona> listaTripulantes, HashSet<Modelo>listaModelos,HashSet<Avion> listaAviones) {
+    public Sistema(AccesoBaseDeDatos baseDeDatos, HashSet<Vuelo> listaVuelos,HashSet<Persona> listaPasajeros, HashSet<Persona> listaTripulantes, HashSet<Modelo>listaModelos,HashSet<Avion> listaAviones) {
         this.baseDeDatos = baseDeDatos;
         this.listaVuelos = listaVuelos;
-        this.listaIdiomas=listaIdiomas;
         this.listaPasajeros = listaPasajeros;
         this.listaTripulantes = listaTripulantes;
         this.listaModelos= listaModelos;
@@ -40,15 +38,6 @@ public class Sistema {
     public void setListaVuelos(HashSet<Vuelo> listaVuelos) {
         this.listaVuelos = listaVuelos;
     }
-
-    public HashSet<Idioma> getListaIdiomas() {
-        return listaIdiomas;
-    }
-
-    public void setListaIdiomas(HashSet<Idioma> listaIdiomas) {
-        this.listaIdiomas = listaIdiomas;
-    }
-
     public HashSet<Persona> getListaPasajeros() {
         return listaPasajeros;
     }
@@ -88,27 +77,8 @@ public class Sistema {
             String nombre=pasajeroId.getValue().get("nombre").toString();
             String apellido=pasajeroId.getValue().get("apellido").toString();
             Date nacimiento= (Date) pasajeroId.getValue().get("fecha_nacimiento");
-
-
-
-        }
-
-    }
-
-    public void cargarDatosIdiomas(ResultSet resultado1) throws SQLException {
-        try {
-            while (resultado1.next()) {
-                int id= resultado1.getInt("ididioma");
-                String nombre=resultado1.getString("idioma");
-                Idioma idioma=new Idioma(id,nombre);
-                listaIdiomas.add(idioma);
-            }
-            resultado1.close();
-        } catch (SQLException excepcion) {
-            excepcion.printStackTrace();
         }
     }
-
 
     public void cargarDatosVuelo(ResultSet resultado1) throws SQLException {
         try {
@@ -283,22 +253,13 @@ public class Sistema {
     public void idiomasHablados(){
         for (Vuelo v: listaVuelos) {
             System.out.println("Vuelo: " + v.getIdVuelo());
-            String idiomasHablados="";
-            for(Idioma idioma1:listaIdiomas){
-                boolean encontrado=false;
-                for (Persona t:v.getTripulantes()){
-                    HashSet<Idioma>idiomasT=((Tripulante)t).getIdiomas();
-                    for (Idioma idiomaT:idiomasT){
-                        if (idiomaT.getNombre_idioma().equals(idioma1.getNombre_idioma())){
-                            encontrado=true;
-                        }
-                    }
-                }
-                if (encontrado){
-                    idiomasHablados=idiomasHablados+idioma1.getNombre_idioma()+ " ";
+            for(Persona t: v.getTripulantes()){
+                System.out.println("Tripulante: " + t.getNombre());
+                System.out.println("Idiomas que Habla: ");
+                for(Idioma i : ((Tripulante)t).getIdiomas()){
+                    System.out.println(i + " ");
                 }
             }
-            System.out.println(idiomasHablados);
         }
     }
 
@@ -317,6 +278,16 @@ public class Sistema {
         System.out.println("Num. de Serie: " + serie);
     }
 
-
+    @Override
+    public String toString() {
+        return "Sistema{" +
+                "baseDeDatos=" + baseDeDatos +
+                ", listaVuelos=" + listaVuelos +
+                ", listaPasajeros=" + listaPasajeros +
+                ", listaTripulantes=" + listaTripulantes +
+                ", listaModelos=" + listaModelos +
+                ", listaAviones=" + listaAviones +
+                '}';
+    }
 }
 

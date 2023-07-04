@@ -165,6 +165,15 @@ public class AccesoBaseDeDatos {
                 "having count(*)<cant_trip_necesaria;");
         db.imprimirDatos(resultado);
     }
+
+    @Override
+    public String toString() {
+        return "AccesoBaseDeDatos{" +
+                "conexion=" + conexion +
+                ", nombreBaseDeDatos='" + nombreBaseDeDatos + '\'' +
+                ", nombreTabla=" + nombreTabla +
+                '}';
+    }
 }
 
 
