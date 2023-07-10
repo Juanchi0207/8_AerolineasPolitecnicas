@@ -5,18 +5,21 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, ParseException {
         AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
         db.conectar("alumno", "alumnoipm");
-        Sistema sistema = new Sistema(db,new HashSet<Vuelo>(),new HashSet<Idioma>(),new HashSet<Persona>(),new HashSet<Persona>(),new HashSet<Modelo>(),new HashSet<Avion>());
+        Sistema sistema = new Sistema(db,new HashSet<Vuelo>(),new HashSet<Persona>(),new HashSet<Persona>(),new HashSet<Modelo>(),new HashSet<Avion>());
         sistema.cargarDatosPasajero(db.obtenerResultado("select dni, nombre,apellido,fecha_nacimiento,vip,necesidades_especiales from persona join pasajero on dni=persona_dni;"));
         sistema.cargarDatosModelo(db.obtenerResultado("Select * from modelo;"));
         sistema.cargarDatosAvion(db.obtenerResultado("select * from avion;"));
-        sistema.cargarDatosTripulantes(db.obtenerResultado(("Select dni,nombre,apellido,fecha_nacimiento,modelo,cant_pasajeros,cant_trip_necesaria, ididioma, idioma from persona join tripulante on dni=persona_dni join idioma_has_tripulante on tripulante_persona_dni=tripulante.persona_dni join idioma on ididioma= idioma_ididioma join modelo_has_tripulante on modelo_has_tripulante.tripulante_persona_dni=persona_dni join modelo on modelo=modelo_modelo;")));
+        sistema.cargarDatosTripulantes(db.obtenerResultado("Select dni,nombre,apellido,fecha_nacimiento from persona join tripulante on dni=persona_dni;"));
         sistema.cargarDatosVuelo(db.obtenerResultado("Select * from vuelo;"));
         System.out.println("Ejercicio 3.a | Muestra los Pasajeros por cada Vuelo en la DB: ");
         System.out.println(" ");
@@ -47,7 +50,15 @@ public class Main {
         System.out.println(" ");
         System.out.println("Ejercicio 3.g | Muestra los idiomas que habla la Tripulacion de cada Vuelo: ");
         System.out.println(" ");
-        sistema.idiomasHablados();
+        HashMap<Integer,HashSet<Idioma>>idiomasHabladosXvuelo =sistema.idiomasHablados();
+        for(Map.Entry<Integer,HashSet<Idioma>>vuelos:idiomasHabladosXvuelo.entrySet()){
+            System.out.println("Vuelo "+vuelos.getKey());
+            String idiomas="";
+            for (Idioma idiomasVuelo: vuelos.getValue()){
+                idiomas=idiomas+idiomasVuelo.getNombre_idioma()+" ";
+            }
+            System.out.println(idiomas);
+        }
         System.out.println(" ");
         System.out.println("Ejercicio 3.h | Muestra el Avion mas nuevo: ");
         System.out.println(" ");

@@ -4,6 +4,10 @@ import Conector.AccesoBaseDeDatos;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class    Sistema {
@@ -70,30 +74,41 @@ public class    Sistema {
         this.listaAviones = listaAviones;
     }
 
-    public void cargarDatosPasajero(ResultSet resultado1) throws SQLException {
+    public void cargarDatosPasajero(ResultSet resultado1) throws SQLException, ParseException {
         HashMap<Integer,HashMap<String,Object>>datosPasajero=baseDeDatos.obtenerDatosPasajero(resultado1);
         for(Map.Entry<Integer, HashMap<String,Object>>  pasajeroId: datosPasajero.entrySet()){
             int dni=pasajeroId.getKey();
             String nombre=pasajeroId.getValue().get("nombre").toString();
             String apellido=pasajeroId.getValue().get("apellido").toString();
             Date nacimiento= (Date) pasajeroId.getValue().get("fecha_nacimiento");
+            String vip1=pasajeroId.getValue().get("vip").toString();
+            Boolean vip=false;
+            if (vip1.equals("1")){
+                vip=true;
+            }
+            String necEspecial1=pasajeroId.getValue().get("necesidades_especiales").toString();
+            Boolean necEspecial=false;
+            if (necEspecial1.equals("1")){
+                necEspecial=true;
+            }
+            Pasajero pasajero=new Pasajero(dni,nombre,apellido,nacimiento,vip,necEspecial);
+            listaPasajeros.add(pasajero);
         }
     }
 
     public void cargarDatosVuelo(ResultSet resultado1) throws SQLException {
-        try {
-            while (resultado1.next()) {
-                int idvuelo=resultado1.getInt("idvuelo");
-                int patente=resultado1.getInt("avion_patente1");
-                Date fecha=resultado1.getDate("fecha_vuelo");
-                String origen=resultado1.getString("origen"); //obtenemos los datos de un vuelo especifico
-                String destino=resultado1.getString("destino");
-                ResultSet resultado2= baseDeDatos.obtenerResultado("select * from tripulante_has_vuelo where vuelo_idvuelo="+idvuelo+";"); //Obtenemos todos los tripulantes asignados al vuelo que estamos recorriendo
-                ResultSet resultado3= baseDeDatos.obtenerResultado("select * from vuelo_has_pasajero where vuelo_idvuelo= "+idvuelo+";"); // Obtenemos todos los pasajeros asignados al vuelo que estamos recorriendo
-                HashSet<Tripulante>tripulantesVuelo=new HashSet<Tripulante>();
+        HashMap<Integer,HashMap<String,Object>>datosVuelo=baseDeDatos.obtenerDatosVuelo(resultado1);
+        for(Map.Entry<Integer, HashMap<String,Object>>  vueloId: datosVuelo.entrySet()){
+        int idvuelo=vueloId.getKey();
+        int patente=Integer.parseInt(vueloId.getValue().get("avion_patente1").toString());
+        Date fecha= (Date) vueloId.getValue().get("fecha_vuelo");
+        String origen=vueloId.getValue().get("origen").toString();
+        String destino=vueloId.getValue().get("destino").toString();
+        ResultSet resultado2= baseDeDatos.obtenerResultado("select * from tripulante_has_vuelo where vuelo_idvuelo="+idvuelo+";"); //Obtenemos todos los tripulantes asignados al vuelo que estamos recorriendo
+        ResultSet resultado3= baseDeDatos.obtenerResultado("select * from vuelo_has_pasajero where vuelo_idvuelo= "+idvuelo+";"); // Obtenemos todos los pasajeros asignados al vuelo que estamos recorriendo
+        HashSet<Tripulante>tripulantesVuelo=new HashSet<Tripulante>();
                 HashSet<Pasajero>pasajerosVuelo=new HashSet<Pasajero>();
                 try {
-
                     while (resultado2.next()){
                         int dniTrip=resultado2.getInt("tripulante_persona_dni");
                         for(Persona trip:listaTripulantes){ //teniendo ya la PK de un triplante
@@ -138,76 +153,61 @@ public class    Sistema {
                 Vuelo vuelo=new Vuelo(idvuelo,avion,fecha,origen,destino,tripulantesVuelo,pasajerosVuelo,new HashMap<>());
                 listaVuelos.add(vuelo);
             }
-            resultado1.close();
-        } catch (SQLException excepcion) {
-            excepcion.printStackTrace();
-        }
     }
 
     public void cargarDatosModelo(ResultSet resultado1) throws SQLException {
-        try {
-            while (resultado1.next()) {
-                String nombreModelo=resultado1.getString("modelo");
-                int cantPasajeros=resultado1.getInt("cant_pasajeros");
-                int cantTripulantes=resultado1.getInt("cant_trip_necesaria");
-                Modelo modelo = new Modelo(nombreModelo,cantPasajeros,cantTripulantes);
-                listaModelos.add(modelo); // Obtenemos los datos de un modelo, y lo agregamos a la lista
-                // general de modelos
-            }
-            resultado1.close();
-        } catch (SQLException excepcion) {
-            excepcion.printStackTrace();
+        HashMap<String, HashMap<String, Object>> datosModelo=baseDeDatos.obtenerDatosModelo(resultado1);
+        for(Map.Entry<String, HashMap<String, Object>> modeloId: datosModelo.entrySet()) {
+            String nombreModelo=modeloId.getKey().toString();
+            int cantPasajeros= Integer.parseInt(modeloId.getValue().get("cant_pasajeros").toString());
+            int cantTripulantes= Integer.parseInt(modeloId.getValue().get("cant_trip_necesaria").toString());
+            Modelo modelo = new Modelo(nombreModelo, cantPasajeros, cantTripulantes);
+            listaModelos.add(modelo);
         }
+         // Obtenemos los datos de un modelo, y lo agregamos a la lista
+        // general de modelos
     }
 
+
     public void cargarDatosAvion(ResultSet resultado1) throws SQLException {
-        try {
-            while (resultado1.next()) {
-                int patente=resultado1.getInt("patente");
-                String modelos=resultado1.getString("modelo_modelo");
-                int numSerie=resultado1.getInt("num_serie");
-                Date fechaFabricacion=resultado1.getDate("fecha_fabricacion");
-                Modelo modelo=new Modelo(); // obtenemos los datos de un avion, y  buscamos el modelo
-                // en la lista general de modelos, para asi agregar todos los datos correspondientes
-                // a este
-                for(Modelo modelo1:listaModelos){
-                    if (modelo1.getModelo()==modelos){
-                        modelo=modelo1;
-                    }
+        HashMap<Integer, HashMap<String, Object>> datosModelo=baseDeDatos.obtenerDatosAvion(resultado1);
+        for(Map.Entry<Integer, HashMap<String, Object>> avionId: datosModelo.entrySet()) {
+            int patente=Integer.parseInt(avionId.getKey().toString());
+            String modeloAux= avionId.getValue().get("modelo_modelo").toString();
+            Modelo modelo=new Modelo();
+            for (Modelo mod1:listaModelos){
+                if (modeloAux.equals(mod1.getModelo())){
+                    modelo=mod1;
                 }
-                Avion avion=new Avion(patente,modelo,numSerie,fechaFabricacion);
-                listaAviones.add(avion); // agregamos el avion con todos sus datos.
             }
-            resultado1.close();
-        } catch (SQLException excepcion) {
-            excepcion.printStackTrace();
+            int numSerie= Integer.parseInt(avionId.getValue().get("num_serie").toString());
+            Date fechaFab= (Date) avionId.getValue().get("fecha_nacimiento");
+            Avion avion = new Avion(patente,modelo,numSerie,fechaFab);
+            listaAviones.add(avion);
         }
     }
 
     public void cargarDatosTripulantes(ResultSet resultado1) throws SQLException {
-        try {
-            while (resultado1.next()) {
-                int dni= resultado1.getInt("dni");
-                String nombre=resultado1.getString("nombre");
-                String apellido=resultado1.getString("apellido");
-                Date fechaNacimiento=resultado1.getDate("fecha_nacimiento");
-                String modelos =resultado1.getString("modelo"); // Obtenemos los datos que el tripulante tiene asignados
-                ResultSet resultado2= baseDeDatos.obtenerResultado("Select * from modelo_has_tripulante where tripulante_persona_dni="+dni+";");
-                // seleccionamos todos los modelos que tiene permitidos volar el tripulante actual
-                int ididioma = resultado1.getInt("ididioma");
-                String nombreIdioma =resultado1.getString("idioma");
-                HashSet<Modelo> modeloNuevo=new HashSet<Modelo>();
-                HashSet<Idioma>idiomaNuevo= new HashSet<Idioma>();
-                Modelo modelo= new Modelo();
-                Idioma idioma = new Idioma();
+        HashMap<Integer,HashMap<String,Object>>datosTripulantes=baseDeDatos.obtenerDatosTripulantes(resultado1);
+        for(Map.Entry<Integer, HashMap<String,Object>>  pasajeroId: datosTripulantes.entrySet()){
+            int dni=pasajeroId.getKey();
+            String nombre=pasajeroId.getValue().get("nombre").toString();
+            String apellido=pasajeroId.getValue().get("apellido").toString();
+            Date nacimiento= (Date) pasajeroId.getValue().get("fecha_nacimiento");
+            ResultSet resultado2 = baseDeDatos.obtenerResultado("Select * from modelo_has_tripulante where tripulante_persona_dni=" + dni + ";");
+            // seleccionamos todos los modelos que tiene permitidos volar el tripulante actual
+            ResultSet resultado3 = baseDeDatos.obtenerResultado("Select idioma_ididioma, idioma from idioma_has_tripulante join idioma on idioma_ididioma=ididioma where tripulante_persona_dni=" + dni + ";");
+            HashSet<Modelo> modeloNuevo = new HashSet<Modelo>();
+            HashSet<Idioma> idiomaNuevo = new HashSet<Idioma>();
+            Modelo modelo = new Modelo();
                 try {
-                    while (resultado2.next()){
-                        String mod=resultado2.getString("modelo_modelo");
-                        for(Modelo modelo1:listaModelos){ // recorremos los modelos que el tripulante
+                    while (resultado2.next()) {
+                        String mod = resultado2.getString("modelo_modelo");
+                        for (Modelo modelo1 : listaModelos) { // recorremos los modelos que el tripulante
                             // puede tripular y los buscamos en la lista general de modelos
                             // asi agregamos todos los datos correspondientes al hashset modeloNuevo,
                             // el cual contiene los modelos permitidos
-                            if (mod.equals(modelo1.getModelo())){
+                            if (mod.equals(modelo1.getModelo())) {
                                 modeloNuevo.add(modelo1);
                             }
                         }
@@ -215,23 +215,22 @@ public class    Sistema {
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
-
-
-                for(Idioma idioma1:listaIdiomas){ // realizamos los mismo de antes con los idiomas, para este
-                    //tripulante obtengo sus idiomas, los busco en la lista general y obtengo todos sus datos
-                    if (idioma1.getIdioma()==ididioma){
-                        idioma=idioma1;
-                        idiomaNuevo.add(idioma);
+                try {
+                    while (resultado3.next()){
+                        int idIdioma=resultado3.getInt("idioma_ididioma");
+                        String nomIdioma=resultado3.getString("idioma");
+                        Idioma idioma1=new Idioma(idIdioma,nomIdioma);
+                        idiomaNuevo.add(idioma1);
                     }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
                 }
-                Tripulante tripulante=new Tripulante(dni,nombre,apellido,fechaNacimiento,modeloNuevo,idiomaNuevo);
+                Tripulante tripulante=new Tripulante(dni,nombre,apellido,nacimiento,modeloNuevo,idiomaNuevo);
                 listaTripulantes.add(tripulante); // creamos y añadimos al tripulante
             }
-            resultado1.close();
-        } catch (SQLException excepcion) {
-            excepcion.printStackTrace();
+
         }
-    }
+
 
     // EJ b
     public void PasajeroMasJoven() throws SQLException{
@@ -250,17 +249,19 @@ public class    Sistema {
         }
     }
     // EJ g
-    public void idiomasHablados(){
+    public HashMap<Integer,HashSet<Idioma>> idiomasHablados(){
+        HashMap<Integer,HashSet<Idioma>> idiomasxVuelo = new HashMap<Integer, HashSet<Idioma>>();
         for (Vuelo v: listaVuelos) {
-            System.out.println("Vuelo: " + v.getIdVuelo());
+            HashSet<Idioma> idiomaxVuelo = new HashSet<Idioma>();
             for(Persona t: v.getTripulantes()){
-                System.out.println("Tripulante: " + t.getNombre());
-                System.out.println("Idiomas que Habla: ");
-                for(Idioma i : ((Tripulante)t).getIdiomas()){
-                    System.out.println(i + " ");
+                HashSet<Idioma>idiomasT=((Tripulante)t).getIdiomas();
+                for (Idioma idioma:idiomasT){
+                    idiomaxVuelo.add(idioma);
                 }
             }
+            idiomasxVuelo.put(v.getIdVuelo(),idiomaxVuelo);
         }
+        return idiomasxVuelo;
     }
 
     // EJ h
