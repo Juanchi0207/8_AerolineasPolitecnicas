@@ -4,6 +4,7 @@ import Clases.*;
 
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 
 public class AccesoBaseDeDatos {
@@ -77,55 +78,6 @@ public class AccesoBaseDeDatos {
         return lista;
     }
 
-    public HashMap<String, HashMap<String,Object>>obtenerDatosModelo(ResultSet resultado) throws SQLException {
-        ArrayList<String>cols=obtenerNombresColumnas(resultado);
-        HashMap<String,HashMap<String,Object>>lista=new HashMap<>();
-        while (resultado.next()){
-            HashMap<String,Object>aux1=new HashMap<>();
-            for(int i=1;i<cols.size();i++){
-                aux1.put(cols.get(i), resultado.getString(cols.get(i)));
-            }
-            lista.put(resultado.getString(cols.get(0)),aux1);
-        }
-        return lista;
-    }
-
-    public HashMap<Integer, HashMap<String,Object>>obtenerDatosAvion(ResultSet resultado) throws SQLException {
-        ArrayList<String>cols=obtenerNombresColumnas(resultado);
-        HashMap<Integer,HashMap<String,Object>>lista=new HashMap<>();
-        while (resultado.next()){
-            HashMap<String,Object>aux1=new HashMap<>();
-            for(int i=1;i<cols.size();i++){
-                if (cols.get(i).equals("fecha_fabricacion")){
-                    aux1.put(cols.get(i),resultado.getDate(cols.get(i)));
-                }
-                else {
-                    aux1.put(cols.get(i), resultado.getString(cols.get(i)));
-                }
-            }
-            lista.put(resultado.getInt(cols.get(0)),aux1);
-        }
-        return lista;
-    }
-
-    public HashMap<Integer, HashMap<String,Object>>obtenerDatosVuelo(ResultSet resultado) throws SQLException {
-        ArrayList<String>cols=obtenerNombresColumnas(resultado);
-        HashMap<Integer,HashMap<String,Object>>lista=new HashMap<>();
-        while (resultado.next()){
-            HashMap<String,Object>aux1=new HashMap<>();
-            for(int i=1;i<cols.size();i++){
-                if (cols.get(i).equals("fecha_vuelo")){
-                    aux1.put(cols.get(i),resultado.getDate(cols.get(i)));
-                }
-                else {
-                    aux1.put(cols.get(i), resultado.getString(cols.get(i)));
-                }
-            }
-            lista.put(resultado.getInt(cols.get(0)),aux1);
-        }
-        return lista;
-    }
-
     public ResultSet obtenerResultado(String consulta) {
         // metodo el cual realiza una consulta que se le pase por parametro y devuelve un resultSet
         // el cual es una variable que tiene todos los datos de la consulta "comprimidos" por ais decirlo
@@ -188,42 +140,53 @@ public class AccesoBaseDeDatos {
     }
 
     public void PasajerosXVuelo() throws SQLException{
-        ResultSet resultado = obtenerResultado("call listarPasajerosXvuelo();");
-        imprimirDatos(resultado);
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        ResultSet resultado = db.obtenerResultado("call listarPasajerosXvuelo();");
+        db.imprimirDatos(resultado);
     }
 
     public void vuelosXtripNoAutorizados() throws SQLException {
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
 
-        obtenerResultado("call vuelosXtripNoAutorizado(@vuelos)");
-        ResultSet resultado= obtenerResultado("select @vuelos as vuelos_con_personas_no_autorizadas;");
-        imprimirDatos(resultado);
+        db.obtenerResultado("call vuelosXtripNoAutorizado(@vuelos)");
+        ResultSet resultado= db.obtenerResultado("select @vuelos as vuelos_con_personas_no_autorizadas;");
+        db.imprimirDatos(resultado);
     }
 
     // EJ e
 
     public void reglaRota() throws SQLException {
-        obtenerResultado("call reglaRota(@tripulantes)");
-        ResultSet resultado= obtenerResultado("select @tripulantes as Tripulantes_que_no_cumplen;");
-        imprimirDatos(resultado);
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
+
+        db.obtenerResultado("call reglaRota(@tripulantes)");
+        ResultSet resultado= db.obtenerResultado("select @tripulantes as Tripulantes_que_no_cumplen;");
+        db.imprimirDatos(resultado);
     }
 
 
     // EJ f
     public void cambiarvueloPasajero(int dni, int idVuelo) throws SQLException {
         Vuelo vuelo = new Vuelo();
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
 
-        ResultSet resultado = obtenerResultado("call CambioPasaje(" + dni + "," + idVuelo + ");");
+        ResultSet resultado = db.obtenerResultado("call CambioPasaje(" + dni + "," + idVuelo + ");");
     }
 
     // EJ c
     public void cantidadMinimaTripulantes() throws SQLException {
+        AccesoBaseDeDatos db = new AccesoBaseDeDatos("AerolineasPolitecnicas");
+        db.conectar("alumno", "alumnoipm");
 
-
-        ResultSet resultado = obtenerResultado("select idvuelo as IDvuelo ,cant_trip_necesaria as TripulacionNecesaria ,count(*) as TripulacionActual from vuelo join avion on patente=avion_patente1 \n" +
+        ResultSet resultado = db.obtenerResultado("select idvuelo as IDvuelo ,cant_trip_necesaria as TripulacionNecesaria ,count(*) as TripulacionActual from vuelo join avion on patente=avion_patente1 \n" +
                 "join modelo on modelo.modelo=avion.modelo_modelo\n" +
                 "join tripulante_has_vuelo on vuelo_idvuelo=idvuelo group by idvuelo\n" +
                 "having count(*)<cant_trip_necesaria;");
-        imprimirDatos(resultado);
+        db.imprimirDatos(resultado);
     }
 
     @Override

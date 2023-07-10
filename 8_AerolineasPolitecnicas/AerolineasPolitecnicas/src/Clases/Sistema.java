@@ -97,18 +97,19 @@ public class    Sistema {
     }
 
     public void cargarDatosVuelo(ResultSet resultado1) throws SQLException {
-        HashMap<Integer,HashMap<String,Object>>datosVuelo=baseDeDatos.obtenerDatosVuelo(resultado1);
-        for(Map.Entry<Integer, HashMap<String,Object>>  vueloId: datosVuelo.entrySet()){
-        int idvuelo=vueloId.getKey();
-        int patente=Integer.parseInt(vueloId.getValue().get("avion_patente1").toString());
-        Date fecha= (Date) vueloId.getValue().get("fecha_vuelo");
-        String origen=vueloId.getValue().get("origen").toString();
-        String destino=vueloId.getValue().get("destino").toString();
-        ResultSet resultado2= baseDeDatos.obtenerResultado("select * from tripulante_has_vuelo where vuelo_idvuelo="+idvuelo+";"); //Obtenemos todos los tripulantes asignados al vuelo que estamos recorriendo
-        ResultSet resultado3= baseDeDatos.obtenerResultado("select * from vuelo_has_pasajero where vuelo_idvuelo= "+idvuelo+";"); // Obtenemos todos los pasajeros asignados al vuelo que estamos recorriendo
-        HashSet<Tripulante>tripulantesVuelo=new HashSet<Tripulante>();
+        try {
+            while (resultado1.next()) {
+                int idvuelo=resultado1.getInt("idvuelo");
+                int patente=resultado1.getInt("avion_patente1");
+                Date fecha=resultado1.getDate("fecha_vuelo");
+                String origen=resultado1.getString("origen"); //obtenemos los datos de un vuelo especifico
+                String destino=resultado1.getString("destino");
+                ResultSet resultado2= baseDeDatos.obtenerResultado("select * from tripulante_has_vuelo where vuelo_idvuelo="+idvuelo+";"); //Obtenemos todos los tripulantes asignados al vuelo que estamos recorriendo
+                ResultSet resultado3= baseDeDatos.obtenerResultado("select * from vuelo_has_pasajero where vuelo_idvuelo= "+idvuelo+";"); // Obtenemos todos los pasajeros asignados al vuelo que estamos recorriendo
+                HashSet<Tripulante>tripulantesVuelo=new HashSet<Tripulante>();
                 HashSet<Pasajero>pasajerosVuelo=new HashSet<Pasajero>();
                 try {
+
                     while (resultado2.next()){
                         int dniTrip=resultado2.getInt("tripulante_persona_dni");
                         for(Persona trip:listaTripulantes){ //teniendo ya la PK de un triplante
@@ -153,37 +154,49 @@ public class    Sistema {
                 Vuelo vuelo=new Vuelo(idvuelo,avion,fecha,origen,destino,tripulantesVuelo,pasajerosVuelo,new HashMap<>());
                 listaVuelos.add(vuelo);
             }
+            resultado1.close();
+        } catch (SQLException excepcion) {
+            excepcion.printStackTrace();
+        }
     }
 
     public void cargarDatosModelo(ResultSet resultado1) throws SQLException {
-        HashMap<String, HashMap<String, Object>> datosModelo=baseDeDatos.obtenerDatosModelo(resultado1);
-        for(Map.Entry<String, HashMap<String, Object>> modeloId: datosModelo.entrySet()) {
-            String nombreModelo=modeloId.getKey().toString();
-            int cantPasajeros= Integer.parseInt(modeloId.getValue().get("cant_pasajeros").toString());
-            int cantTripulantes= Integer.parseInt(modeloId.getValue().get("cant_trip_necesaria").toString());
-            Modelo modelo = new Modelo(nombreModelo, cantPasajeros, cantTripulantes);
-            listaModelos.add(modelo);
+        try {
+            while (resultado1.next()) {
+                String nombreModelo=resultado1.getString("modelo");
+                int cantPasajeros=resultado1.getInt("cant_pasajeros");
+                int cantTripulantes=resultado1.getInt("cant_trip_necesaria");
+                Modelo modelo = new Modelo(nombreModelo,cantPasajeros,cantTripulantes);
+                listaModelos.add(modelo); // Obtenemos los datos de un modelo, y lo agregamos a la lista
+                // general de modelos
+            }
+            resultado1.close();
+        } catch (SQLException excepcion) {
+            excepcion.printStackTrace();
         }
-         // Obtenemos los datos de un modelo, y lo agregamos a la lista
-        // general de modelos
     }
 
-
     public void cargarDatosAvion(ResultSet resultado1) throws SQLException {
-        HashMap<Integer, HashMap<String, Object>> datosModelo=baseDeDatos.obtenerDatosAvion(resultado1);
-        for(Map.Entry<Integer, HashMap<String, Object>> avionId: datosModelo.entrySet()) {
-            int patente=Integer.parseInt(avionId.getKey().toString());
-            String modeloAux= avionId.getValue().get("modelo_modelo").toString();
-            Modelo modelo=new Modelo();
-            for (Modelo mod1:listaModelos){
-                if (modeloAux.equals(mod1.getModelo())){
-                    modelo=mod1;
+        try {
+            while (resultado1.next()) {
+                int patente=resultado1.getInt("patente");
+                String modelos=resultado1.getString("modelo_modelo");
+                int numSerie=resultado1.getInt("num_serie");
+                Date fechaFabricacion=resultado1.getDate("fecha_fabricacion");
+                Modelo modelo=new Modelo(); // obtenemos los datos de un avion, y  buscamos el modelo
+                // en la lista general de modelos, para asi agregar todos los datos correspondientes
+                // a este
+                for(Modelo modelo1:listaModelos){
+                    if (modelo1.getModelo()==modelos){
+                        modelo=modelo1;
+                    }
                 }
+                Avion avion=new Avion(patente,modelo,numSerie,fechaFabricacion);
+                listaAviones.add(avion); // agregamos el avion con todos sus datos.
             }
-            int numSerie= Integer.parseInt(avionId.getValue().get("num_serie").toString());
-            Date fechaFab= (Date) avionId.getValue().get("fecha_nacimiento");
-            Avion avion = new Avion(patente,modelo,numSerie,fechaFab);
-            listaAviones.add(avion);
+            resultado1.close();
+        } catch (SQLException excepcion) {
+            excepcion.printStackTrace();
         }
     }
 
