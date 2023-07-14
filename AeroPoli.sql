@@ -445,17 +445,24 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`alumno`@`localhost` PROCEDURE `cambioPasaje`(in idPasajero int, in vueloID int)
 begin
-declare FV int;
-declare idVueloNuevo int;
-declare origenNuevo varchar(45);
-declare destinoNuevo varchar(45);
-select week(fecha_vuelo)+1 into FV from vuelo where idvuelo = vueloID;
-select origen into origenNuevo from vuelo where idvuelo=vueloID;
-select destino into destinoNuevo from vuelo where idvuelo=vueloID;
-select idvuelo into idVueloNuevo from vuelo where week(fecha_vuelo)=FV
-and destino=destinoNuevo and origen=origenNuevo;
-update vuelo_has_pasajero set vuelo_idvuelo = idVueloNuevo 
-where idPasajero = pasajero_persona_dni and vuelo_idvuelo=vueloID;
+	declare FV int;
+	declare idVueloNuevo int;
+	declare origenNuevo varchar(45);
+	declare destinoNuevo varchar(45);
+    declare cantidadPasajeros int;
+    declare cantVuelo int;
+	select week(fecha_vuelo)+1 into FV from vuelo where idvuelo = vueloID;
+	select origen into origenNuevo from vuelo where idvuelo=vueloID;
+	select destino into destinoNuevo from vuelo where idvuelo=vueloID;
+	select idvuelo into idVueloNuevo from vuelo where week(fecha_vuelo)=FV
+	and destino=destinoNuevo and origen=origenNuevo;
+    select count(*) into cantidadPasajeros from vuelo_has_pasajero where vuelo_idvuelo=idVueloNuevo;
+    select cant_pasajeros into cantVuelo from vuelo join avion on avion_patente1=patente
+    join modelo on modelo_modelo=modelo where idvuelo=idVueloNuevo;
+    if (cantidadPasajeros + 1<=cantVuelo) then
+	update vuelo_has_pasajero set vuelo_idvuelo = idVueloNuevo 
+	where idPasajero = pasajero_persona_dni and vuelo_idvuelo=vueloID;
+    end if;
 end ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -614,4 +621,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-06-30 17:17:45
+-- Dump completed on 2023-07-14 15:59:40
